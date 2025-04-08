@@ -31,6 +31,6 @@ keywords:
 Tener **variables multicolineales** dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis.
 Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una **matriz de correlación**.
 
-![Fig. 1: Matriz de correlación entre las distintas bandas](img/heatmap.png){width=100%}
+![Fig. 1: Matriz de correlación entre las distintas bandas.](img/heatmap.svg){width=80%}
 
 Una forma aún más automática de detectar tales asociaciones es utilizar **eigenvectores**.
