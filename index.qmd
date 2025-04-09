@@ -27,10 +27,24 @@ keywords:
   - Quarto
 ---
 
-# Estadística de datos
+# Estadísticas de los datos
+
+Determinar las variables más importantes a incluir y excluir en un modelo y cuales de ellas contribuyen en mayor grado a predicciones satisfactorias resulta crítico en cualquier investigación rigurosa. Aunque no existe un método definitivo o inequívoco para establecer la importancia de la variable predictora, existen varios métodos aceptados que involucran un **análisis exploratorio** de los datos.
+
+## Correlación entre variables
+
 Tener **variables multicolineales** dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis.
 Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una **matriz de correlación**.
 
 ![Fig. 1: Matriz de correlación entre las distintas bandas.](img/heatmap.svg){width=80%}
 
 Una forma aún más automática de detectar tales asociaciones es utilizar **eigenvectores**.
+
+# Estrategias de regresión
+
+La regresión lineal se define como una **técnica estadística** utilizada para relacionar un conjunto de variables independientes y una variable de respuesta ajustando una ecuación lineal a los datos observados.
+
+## Step-wise linear regressión
+
+La regresión por pasos es un método que **examina iterativamente (repetidamente) la significancia estadística de cada variable independiente** en un modelo de regresión lineal. El método de selección progresiva parte de cero y añade cada nueva variable de forma incremental, comprobando la significancia estadística. El método de eliminación regresiva parte de un modelo completo con varias variables y luego elimina una para comprobar su importancia en relación con los resultados generales.
+

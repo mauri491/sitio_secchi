@@ -3055,7 +3055,14 @@ vertical-align: -.125em;
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#estadística-de-datos" id="toc-estadística-de-datos" class="nav-link active" data-scroll-target="#estadística-de-datos"><span class="header-section-number">1</span> Estadística de datos</a></li>
+  <li><a href="#estadísticas-de-los-datos" id="toc-estadísticas-de-los-datos" class="nav-link active" data-scroll-target="#estadísticas-de-los-datos"><span class="header-section-number">1</span> Estadísticas de los datos</a>
+  <ul class="collapse">
+  <li><a href="#correlación-entre-variables" id="toc-correlación-entre-variables" class="nav-link" data-scroll-target="#correlación-entre-variables"><span class="header-section-number">1.1</span> Correlación entre variables</a></li>
+  </ul></li>
+  <li><a href="#estrategias-de-regresión" id="toc-estrategias-de-regresión" class="nav-link" data-scroll-target="#estrategias-de-regresión"><span class="header-section-number">2</span> Estrategias de regresión</a>
+  <ul class="collapse">
+  <li><a href="#step-wise-linear-regressión" id="toc-step-wise-linear-regressión" class="nav-link" data-scroll-target="#step-wise-linear-regressión"><span class="header-section-number">2.1</span> Step-wise linear regressión</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -3113,8 +3120,11 @@ vertical-align: -.125em;
 </header>
 
 
-<section id="estadística-de-datos" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Estadística de datos</h1>
+<section id="estadísticas-de-los-datos" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Estadísticas de los datos</h1>
+<p>Determinar las variables más importantes a incluir y excluir en un modelo y cuales de ellas contribuyen en mayor grado a predicciones satisfactorias resulta crítico en cualquier investigación rigurosa. Aunque no existe un método definitivo o inequívoco para establecer la importancia de la variable predictora, existen varios métodos aceptados que involucran un <strong>análisis exploratorio</strong> de los datos.</p>
+<section id="correlación-entre-variables" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="correlación-entre-variables"><span class="header-section-number">1.1</span> Correlación entre variables</h2>
 <p>Tener <strong>variables multicolineales</strong> dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis. Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una <strong>matriz de correlación</strong>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -3123,6 +3133,15 @@ vertical-align: -.125em;
 </figure>
 </div>
 <p>Una forma aún más automática de detectar tales asociaciones es utilizar <strong>eigenvectores</strong>.</p>
+</section>
+</section>
+<section id="estrategias-de-regresión" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Estrategias de regresión</h1>
+<p>La regresión lineal se define como una <strong>técnica estadística</strong> utilizada para relacionar un conjunto de variables independientes y una variable de respuesta ajustando una ecuación lineal a los datos observados.</p>
+<section id="step-wise-linear-regressión" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="step-wise-linear-regressión"><span class="header-section-number">2.1</span> Step-wise linear regressión</h2>
+<p>La regresión por pasos es un método que <strong>examina iterativamente (repetidamente) la significancia estadística de cada variable independiente</strong> en un modelo de regresión lineal. El método de selección progresiva parte de cero y añade cada nueva variable de forma incremental, comprobando la significancia estadística. El método de eliminación regresiva parte de un modelo completo con varias variables y luego elimina una para comprobar su importancia en relación con los resultados generales.</p>
+</section>
 </section>
 
 </main>
