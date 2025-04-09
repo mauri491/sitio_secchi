@@ -4,4 +4,4 @@ Este sitio web contiene cuestiones relacionadas a la estimación de la profundid
 
 # Contacto
 
-Sitio web mantenido por Mauricio Acosta [✉](mailto:victor.gauto@outlook.com)
+Sitio web mantenido por Mauricio Acosta [✉](mailto:mauriba491@gmail.com)
