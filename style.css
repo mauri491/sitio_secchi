@@ -1,3 +1,10 @@
 body{
     text-align: justify;
+    container-type: inline-size;
+}
+
+table {
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100% !important;
 }

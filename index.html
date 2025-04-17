@@ -3204,7 +3204,7 @@ window.Quarto = {
 };
 </script>
 
-<style type="text/css">body{text-align: justify;}.caption {text-align: left !important;}</style>
+<style type="text/css">body{text-align: justify;container-type: inline-size;}table {overflow-x: auto;white-space: nowrap;width: 100% !important;}</style>
 </head>
 
 <body>
@@ -3293,6 +3293,7 @@ window.Quarto = {
 <section id="métodos-tradicionales-de-estimación" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="métodos-tradicionales-de-estimación"><span class="header-section-number">1.2</span> Métodos tradicionales de estimación</h2>
 <p>En las últimas décadas, se han desarrollado múltiples ecuaciones empíricas y modelos basados en datos in situ y sensores remotos para estimar esta profundidad de manera eficiente y a gran escala. El objetivo de recopilar es identificar patrones comunes, variables predictoras relevantes y estrategias metodológicas empleadas.</p>
+<div class="table-responsive">
 <table class="table-striped table-hover table">
 <caption>Tabla 1: Algoritmos publicados para la predicción de <span class="math inline">\(\mathrm{SDD}\)</span> utilizando la plataforma Landstat <span class="citation" data-cites="Rubin"><a href="#ref-Rubin" role="doc-biblioref">[1]</a></span>.</caption>
 <colgroup>
@@ -3356,6 +3357,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
+</div>
 <p>En la mayoría de los casos la relación entre <span class="math inline">\(SDD\)</span> y la intensidad de la luz es no lineal, por lo que se utiliza <span class="math inline">\(ln(SDD)\)</span> para realizar la regresión.</p>
 <p>La correlación con la banda roja puede explicarse causalmente por la correlación positiva directa entre la reflectancia en el rojo y la carga bruta de partículas que induce la dispersión de partículas. De manera que mientras que la claridad del agua <span class="math inline">\((SDD)\)</span> desciende, la intensidad en el rojo aumenta <span class="citation" data-cites="Matthews"><a href="#ref-Matthews" role="doc-biblioref">[2]</a></span>.</p>
 </section>
@@ -3382,6 +3384,7 @@ window.Quarto = {
 <p>Como se obserba en la Figura 1, existe una alta correlación entre distintas bandas. Esto impide evaluar de manera directa el efecto de la remoción de una de las variables al modelo debido a que su efecto se verá compensado por el aumento de la contribución por parte de otra variable correlacionada.</p>
 <p>Lo cierto es que, si bien el efecto de una variable se ve afectada por tanto por el modelo mismo y por las demás variables predictoras, las métricas como el <span class="math inline">\(R^2\)</span> incremental o evaluar el <span class="math inline">\(R^2\)</span> de cada variable individualmente siguen siendo útiles para realizar una estimación.</p>
 <p>Analizando la correlación de cada banda individual con <span class="math inline">\(ln(SDD)\)</span> provenientes de 46 muestras de agua tenemos que:</p>
+<div class="table-responsive">
 <table class="table-striped table-hover table">
 <caption>Tabla 2: Correlaciones individuales.</caption>
 <thead>
@@ -3405,15 +3408,15 @@ window.Quarto = {
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\mathrm{B04}\)</span> (red)</td>
-<td>0.294</td>
+<td><strong>0.294</strong></td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\mathrm{B05}\)</span> (red edge)</td>
-<td>0.326</td>
+<td><strong>0.326</strong></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(\mathrm{B06}\)</span></td>
-<td>0.140</td>
+<td><strong>0.140</strong></td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(\mathrm{B07}\)</span></td>
@@ -3433,6 +3436,7 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
+</div>
 <p>Donde se observa una alta correlación con las bandas correspondientes a la longitud de onda del rojo, posiblemente por lo ya visto relacionado a la alta presencia de material particulado en gran parte de las aguas de estudio.</p>
 
 </section>

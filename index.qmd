@@ -12,8 +12,10 @@ format:
     csl: bibliografia/ieee.csl
     cap-location: bottom
 date: last-modified
+
 language: 
   title-block-author-single: "Autor"
+
 author:
   - name: Mauricio Acosta
     orcid: 
@@ -22,6 +24,7 @@ author:
     affiliations:
       - name: GISTAQ (UTN-FRRe)
         url: https://www.instagram.com/gistaq.utn/
+
 abstract: |
   Este sitio web contiene cuestiones relacionadas a la estimación de la profundidad de disco de Secchi mediante técnicas de sensado remoto. Se presenta información proveniente de investigaciones previas y se discute la confección de modelos de regresión  mediante código de programación así como su evaluación mediante pruebas estadísticas.
 keywords:
@@ -53,7 +56,9 @@ En las últimas décadas, se han desarrollado múltiples ecuaciones empíricas y
 | Kloiber et al.         | $\mathrm{ln(SDD)}$ | $\mathrm{Blue/Red + Blue}$              | 374      | 0.93 |
 | Lathrop and Lillesand  | $\mathrm{ln(SDD)}$ | $\mathrm{Green}$                        | 9        | 0.98 |
 | Mancino et al.         | $\mathrm{SDD}$     | $\mathrm{Red/Green + Blue/Green + Blue}$| 60       | 0.82 |
-: Tabla 1: Algoritmos publicados para la predicción de $\mathrm{SDD}$ utilizando la plataforma Landstat @Rubin. {.striped .hover}
+
+
+: Tabla 1: Algoritmos publicados para la predicción de $\mathrm{SDD}$ utilizando la plataforma Landstat @Rubin. {.striped .hover .responsive}
 
 En la mayoría de los casos la relación entre $SDD$ y la intensidad de la luz es no lineal, por lo que se utiliza $ln(SDD)$ para realizar la regresión.
 
@@ -90,14 +95,15 @@ Analizando la correlación de cada banda individual con $ln(SDD)$ provenientes d
 | $\mathrm{B01}$            | -0.071 |
 | $\mathrm{B02}$ (blue)     | -0.051 |
 | $\mathrm{B03}$ (green)    | 0.033  |
-| $\mathrm{B04}$ (red)      | 0.294  |
-| $\mathrm{B05}$ (red edge) | 0.326  |
-| $\mathrm{B06}$            | 0.140  |
+| $\mathrm{B04}$ (red)      | **0.294**  |
+| $\mathrm{B05}$ (red edge) | **0.326**  |
+| $\mathrm{B06}$            | **0.140**  |
 | $\mathrm{B07}$            | 0.132  |
 | $\mathrm{B8A}$            | -0.002 |
 | $\mathrm{B11}$            | -0.025 |
 | $\mathrm{B12}$            | -0.034 |
-: Tabla 2: Correlaciones individuales. {.striped .hover}
+
+: Tabla 2: Correlaciones individuales. {.striped .hover .responsive}
 
 Donde se observa una alta correlación con las bandas correspondientes a la longitud de onda del rojo, posiblemente por lo ya visto relacionado a la alta presencia de material particulado en gran parte de las aguas de estudio.
 
