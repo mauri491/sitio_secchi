@@ -3204,6 +3204,7 @@ window.Quarto = {
 };
 </script>
 
+<style type="text/css">body{text-align: justify;}</style>
 </head>
 
 <body>
@@ -3214,12 +3215,12 @@ window.Quarto = {
     <h2 id="toc-title">Tabla de contenidos</h2>
    
   <ul>
-  <li><a href="#profundidad-de-disco-de-secchi" id="toc-profundidad-de-disco-de-secchi" class="nav-link active" data-scroll-target="#profundidad-de-disco-de-secchi"><span class="header-section-number">1</span> Profundidad de disco de Secchi<span style="font-weight:normal; font-size: 1rem"></span></a>
+  <li><a href="#profundidad-de-disco-de-secchi" id="toc-profundidad-de-disco-de-secchi" class="nav-link active" data-scroll-target="#profundidad-de-disco-de-secchi"><span class="header-section-number">1</span> Profundidad de disco de Secchi</a>
   <ul class="collapse">
   <li><a href="#métodos-tradicionales" id="toc-métodos-tradicionales" class="nav-link" data-scroll-target="#métodos-tradicionales"><span class="header-section-number">1.1</span> Métodos tradicionales</a></li>
   <li><a href="#métodos-de-aprendizaje-automático" id="toc-métodos-de-aprendizaje-automático" class="nav-link" data-scroll-target="#métodos-de-aprendizaje-automático"><span class="header-section-number">1.2</span> Métodos de aprendizaje automático</a></li>
   </ul></li>
-  <li><a href="#estadísticas-de-los-datos" id="toc-estadísticas-de-los-datos" class="nav-link" data-scroll-target="#estadísticas-de-los-datos"><span class="header-section-number">2</span> Estadísticas de los datos</a>
+  <li><a href="#estadística-de-los-datos" id="toc-estadística-de-los-datos" class="nav-link" data-scroll-target="#estadística-de-los-datos"><span class="header-section-number">2</span> Estadística de los datos</a>
   <ul class="collapse">
   <li><a href="#correlación-entre-variables" id="toc-correlación-entre-variables" class="nav-link" data-scroll-target="#correlación-entre-variables"><span class="header-section-number">2.1</span> Correlación entre variables</a></li>
   </ul></li>
@@ -3260,7 +3261,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Fecha de publicación</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">14 de abril de 2025</p>
+      <p class="date">16 de abril de 2025</p>
     </div>
   </div>
   
@@ -3285,12 +3286,10 @@ window.Quarto = {
 
 
 <section id="profundidad-de-disco-de-secchi" class="level1 page-columns page-full" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Profundidad de disco de Secchi<span style="font-weight:normal; font-size: 1rem"></span></h1>
+<h1 data-number="1"><span class="header-section-number">1</span> Profundidad de disco de Secchi</h1>
 <p>La transparencia del agua es uno de los componentes clave para describir la calidad y productividad de aguas naturales. Antes de la disponibilidad de radiómetros, el campo de luz bajo el agua era estimado sólo mediante la observación visual del disco de Secchi.</p>
-<p>El disco de Secchi <strong>es un instrumento de medición de la penetración luminosa</strong>. Se utiliza midiendo la profundidad desde la superficie de masa de agua que el disco alcanza hasta perderse de vista.</p>
-<p>El disco de Secchi sigue siendo utilizado debido a la simplicidad y rango de aplicación universal del método, además de tratarse de un parámetro fácilmente entendible por el público.</p>
-<p>La profundidad de disco de Secchi es influenciada por tres componentes ópticos principales: clorofila-a, materia orgánica disuelta coloreada, y sólidos suspendidos totales.</p>
-<p>Como se señaló en el apartado de turbidez, se observa una relación inversa entre esta y la profundidad de disco de Secchi.</p>
+<p>El disco de Secchi <strong>es un instrumento de medición de la penetración luminosa</strong>. Se utiliza midiendo la profundidad desde la superficie de masa de agua que el disco alcanza hasta perderse de vista. Continua siendo utilizado debido a la simplicidad y rango de aplicación universal del método, además de tratarse de un parámetro fácilmente entendible por el público.</p>
+<p>La profundidad de disco de Secchi es influenciada por tres componentes ópticos principales: clorofila-a, materia orgánica disuelta coloreada, y sólidos suspendidos totales, observandose una relación inversa entre esta y la profundidad de disco de Secchi.</p>
 <section id="métodos-tradicionales" class="level2 page-columns page-full" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="métodos-tradicionales"><span class="header-section-number">1.1</span> Métodos tradicionales</h2>
 <p>Las ecuaciones principales propuestas son de tipo <strong>logarítmica</strong> o <strong>potencial</strong>, lo cual tiene sentido considerando que la relación entre la reflectancia y la turbidez no es lineal. No obstante, algunas ecuaciones lineales presentan un buen desempeño. En ambos tipos de ecuación se repite la presencia de un <strong>cociente</strong> entre bandas.</p>
@@ -3376,8 +3375,8 @@ Tabla 1: Características principales de algoritmos de aprendizaje automático 
 <p>La información se procesa interpretando a los datos como unidimensionales, representando a los valores de reflectancia tomados en todas las longitudes de onda disponibles para una única profundidad medida. La hipótesis es que la relación entre la reflectividad de distintas bandas, capturadas utilizando convolución, codifica la claridad del cuerpo de agua medido como profundidad de disco de Secchi.</p>
 </section>
 </section>
-<section id="estadísticas-de-los-datos" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Estadísticas de los datos</h1>
+<section id="estadística-de-los-datos" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Estadística de los datos</h1>
 <p>Determinar las variables más importantes a incluir y excluir en un modelo y cuales de ellas contribuyen en mayor grado a predicciones satisfactorias resulta crítico en cualquier investigación rigurosa. Aunque no existe un método definitivo o inequívoco para establecer la importancia de la variable predictora, existen varios métodos aceptados que involucran un <strong>análisis exploratorio</strong> de los datos.</p>
 <section id="correlación-entre-variables" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="correlación-entre-variables"><span class="header-section-number">2.1</span> Correlación entre variables</h2>
