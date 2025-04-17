@@ -11,6 +11,8 @@ format:
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
 date: last-modified
+language: 
+  title-block-author-single: "Autor"
 author:
   - name: Mauricio Acosta
     orcid: 
