@@ -10,6 +10,7 @@ format:
     lang: es
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
+    cap-location: bottom
 date: last-modified
 language: 
   title-block-author-single: "Autor"
@@ -30,84 +31,73 @@ keywords:
   - Quarto
 ---
 
-# Profundidad de disco de Secchi
+# Revisión bibliográfica
 
-La transparencia del agua es uno de los componentes clave para describir la calidad y productividad de aguas naturales. Antes de la disponibilidad de radiómetros, el campo de luz bajo el agua era estimado sólo mediante la observación visual del disco de Secchi.
+Esta revisión tiene como objetivo identificar los enfoques más comunes en la literatura, los tipos de datos utilizados y las variables espectrales que se consideran más relevantes para este tipo de estimaciones.
 
-El disco de Secchi **es un instrumento de medición de la penetración luminosa**. Se utiliza midiendo la profundidad desde la superficie de masa de agua que el disco alcanza hasta perderse de vista. Continua siendo utilizado debido a la simplicidad y rango de aplicación universal del método, además de tratarse de un parámetro fácilmente entendible por el público.
+## Profundidad de disco de Secchi
 
-La profundidad de disco de Secchi es influenciada por tres componentes ópticos principales: clorofila-a, materia orgánica disuelta coloreada, y sólidos suspendidos totales, observandose una relación inversa entre esta y la profundidad de disco de Secchi.
+La profundidad de visibilidad del disco de Secchi $(SDD)$ es una medida ampliamente utilizada para evaluar la transparencia del agua. Se define como la profundidad en metros a la cual un disco blanco circular desaparece al dejarlo descender en un cuerpo de agua.
 
-## Métodos tradicionales
+Esta variable es un indicador indirecto de la calidad del agua, ya que se relaciona con la concentración de sedimentos en suspensión, fitoplancton y otros materiales particulados. Continua siendo utilizado debido a la simplicidad y rango de aplicación universal del método, además de tratarse de un parámetro fácilmente entendible por el público.
 
-Las ecuaciones principales propuestas son de tipo **logarítmica** o **potencial**, lo cual tiene sentido considerando que la relación entre la reflectancia y la turbidez no es lineal. No obstante, algunas ecuaciones lineales presentan un buen desempeño. En ambos tipos de ecuación se repite la presencia de un **cociente** entre bandas.
+## Métodos tradicionales de estimación
 
-:::: {.content-visible when-format="html"}
+En las últimas décadas, se han desarrollado múltiples ecuaciones empíricas y modelos basados en datos in situ y sensores remotos para estimar esta profundidad de manera eficiente y a gran escala. El objetivo de recopilar es identificar patrones comunes, variables predictoras relevantes y estrategias metodológicas empleadas.
 
-::: {.column-screen-right}
+| Nombre                 | Variable           | Formula                                 | Muestras | R²   |
+|------------------------|--------------------|-----------------------------------------|----------|------|
+| Dekker and Peters      | $\mathrm{ln(SDD)}$ | $\mathrm{ln(Red)}$                      | 15       | 0.86 |
+| Dominguez Gomez et al. | $\mathrm{SDD}$     | $\mathrm{(Green)^x}$                    | 16       | 0.90 |
+| Giardino et al.        | $\mathrm{SDD}$     | $\mathrm{Blue/Green}$                   | 4        | 0.85 |
+| Kloiber et al.         | $\mathrm{ln(SDD)}$ | $\mathrm{Blue/Red + Blue}$              | 374      | 0.93 |
+| Lathrop and Lillesand  | $\mathrm{ln(SDD)}$ | $\mathrm{Green}$                        | 9        | 0.98 |
+| Mancino et al.         | $\mathrm{SDD}$     | $\mathrm{Red/Green + Blue/Green + Blue}$| 60       | 0.82 |
+: Tabla 1: Algoritmos publicados para la predicción de $\mathrm{SDD}$ utilizando la plataforma Landstat @Rubin. {.striped .hover}
 
-| Ecuación | Bandas (nm) | Métricas | Aguas | Plataforma | Referencia |
-|:-:|:--|:--|:--|:--|:-:|
-| $A \left[  \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})}  \right]^{B}$ | 409 (B02)<br>709 (B05) | $R^{2}$, RMSE | Ópticamente complejas^[Señalan una mala correlación para el cociente 409/560 (B02/B03).] | MERIS | @Alikas2017 |
-| $e^{a \left[ \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})} \right]+b}$ | 409 (B02)<br>709 (B05) | $R^{2}$, RMSE, Bias | Interiores variadas^[Modificación de Alikas-Kratzer. Señala que el previamente descartado cociente 409/560 se usa para aguas donde el contribuyente principal a la turbidez es el fitoplancton.] | Sentinel-2 | @Pereira-Sandoval2019 |
-| $A \left[ \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})}  \right]^{B}$ | 409 (B02)<br>560 (B03) | $R^{2}$, RMSE | Embalses^[Señala Polymer y C2X como los mejores algoritmos de corrección atmosférica. Indica que su ecuación es equivalente a la de Pereira-Sandoval.] | Sentinel-2 | @Delegido2019 |
-| $1.79-134.15 \cdot B_{RE1}+157.72 \cdot B_{NIR}+0.52 \frac{B_{RE3}}{NIR_{n}}$ |  | $R^{2}$, RMSE | Reserva^[Corrección atmosférica con el módulo Sen2Cor. Al ser lineal, produce una sobrestimación para valores bajos y una subestimación para valores altos.] | Sentinel-2 | @Bonansea2019 |
-| $\log(SDD)=-3.0257-1.4379 \cdot  \log(R_{B8A})-0.127 \left[ \log(R_{B8A}) \right]^{2}$ |  | $R^{2}$ | Oceános^[Corrección con Sen2Cor.] | Sentinel-2 | @Delegido2016 |
+En la mayoría de los casos la relación entre $SDD$ y la intensidad de la luz es no lineal, por lo que se utiliza $ln(SDD)$ para realizar la regresión.
 
-: Características principales de algoritmos de aprendizaje automático para la estimación de profundidad de disco de Secchi. {#tbl-secchi-machine .striped .hover tbl-colwidths="[50,10,10,10,10]"}
+La correlación con la banda roja puede explicarse causalmente por la correlación positiva directa entre la reflectancia en el rojo y la carga bruta de partículas que induce la dispersión de partículas. De manera que mientras que la claridad del agua $(SDD)$ desciende, la intensidad en el rojo aumenta @Matthews.
 
-:::
+# Materiales y métodos
 
-::::
+Al momento de publicación, se realizaron ensayos de sólidos suspendidos y turbidez así como mediciones in-situ de profundidad de disco de Secchi entre otras sobre 46 muestras tomados a lo largo de la transecta sobre el río Paraná para obtener las propiedades fisicoquímicas del agua. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en los puntos de muestreo.
 
-:::: {.content-visible when-format="typst"}
+# Estadísticas
 
-| Ecuación | Referencia |
-|:--|:-:|
-| $A \left[  \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})}  \right]^{B}$ | [@Alikas2017] |
-| $e^{a \left[ \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})} \right]+b}$ | [@Pereira-Sandoval2019] |
-| $A \left[ \frac{R_{rs}( \lambda_{1})}{R_{rs}( \lambda_{2})}  \right]^{B}$ | [@Delegido2019] |
-| $1.79-134.15 \cdot B_{RE1}+157.72 \cdot B_{NIR}+0.52 \frac{B_{RE3}}{NIR_{n}}$ | [@Bonansea2019] |
-| $\log(SDD)=-3.0257-1.4379 \cdot  \log(R_{B8A})-0.127 \left[ \log(R_{B8A}) \right]^{2}$ | [@Delegido2016] |
+La identificación de las variables más relevantes para incluir o excluir en un modelo predictivo es un paso fundamental en cualquier investigación rigurosa, especialmente cuando se busca construir modelos con alto poder explicativo y capacidad de generalización. 
 
-: Características principales de algoritmos de aprendizaje automático para la estimación de profundidad de disco de Secchi. {#tbl-secchi-machine .striped .hover tbl-colwidths="[80,20]"}
+Comprender qué variables contribuyen en mayor medida a la calidad de las predicciones permite no solo mejorar el desempeño del modelo, sino también interpretar con mayor claridad los fenómenos subyacentes que se están estudiando.
 
-::: {.block fill="luma(230)" inset="8pt" radius="4pt"}
+Si bien no existe un único método definitivo para determinar la importancia relativa de cada variable predictora, la literatura propone diversas estrategias que, en su mayoría, parten de un análisis exploratorio de los datos.
 
-[Ver tabla completa en la versión online](https://vhgauto.quarto.pub/gistaq-parana/#tbl-secchi-machine)
+## Análisis exploratorio de los datos
 
-:::
+Tener variables multicolineales dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis.
 
-::::
-
-## Métodos de aprendizaje automático
-
-A modo de identificar y aprender los patrones subyacentes en las series de datos para asegurar la transferibilidad a través de espacio y tiempo de los distintos modelos obtenidos se destaca el uso de algoritmos como **Random Forest** y la aplicación de **Redes neuronales**.
-
-Los **modelos de regresión mediante random forest**, construidos utilizando las bandas previamente halladas por modelos algebraicos, demostraron explicar de manera consistente una mayor variabilidad que otros algoritmos, indicado por un mayor $pseudo-R^2$. Se señala además que los algoritmos con el mejor rendimiento tienden a ser aquellos que incluye bandas del infrarrojo cercano.
-
-Una alternativa con un rendimiento superior a los modelos regresión resulta de aplicación de **redes neuronales convolucionales de una dimensión**. Estas aplican operaciones de convolución y extracción de características en la dimensión espectral de una imagen multiespectral, permitiendo encontrar patrones complejos y relaciones entre las características y el valor medido.
-
-La información se procesa interpretando a los datos como unidimensionales, representando a los valores de reflectancia tomados en todas las longitudes de onda disponibles para una única profundidad medida. La hipótesis es que la relación entre la reflectividad de distintas bandas, capturadas utilizando convolución, codifica la claridad del cuerpo de agua medido como profundidad de disco de Secchi.
-
-# Estadística de los datos
-
-Determinar las variables más importantes a incluir y excluir en un modelo y cuales de ellas contribuyen en mayor grado a predicciones satisfactorias resulta crítico en cualquier investigación rigurosa. Aunque no existe un método definitivo o inequívoco para establecer la importancia de la variable predictora, existen varios métodos aceptados que involucran un **análisis exploratorio** de los datos.
-
-## Correlación entre variables
-
-Tener **variables multicolineales** dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis.
-Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una **matriz de correlación**.
+Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una matriz de correlación.
 
 ![Fig. 1: Matriz de correlación entre las distintas bandas.](img/heatmap.svg){width=80%}
 
-Una forma aún más automática de detectar tales asociaciones es utilizar **eigenvectores**.
+Como se obserba en la Figura 1, existe una alta correlación entre distintas bandas. Esto impide evaluar de manera directa el efecto de la remoción de una de las variables al modelo debido a que su efecto se verá compensado por el aumento de la contribución por parte de otra variable correlacionada. 
 
-# Estrategias de regresión
+Lo cierto es que, si bien el efecto de una variable se ve afectada por tanto por el modelo mismo y por las demás variables predictoras, las métricas como  el $R^2$ incremental o evaluar el $R^2$ de cada variable individualmente siguen siendo útiles para realizar una estimación. 
 
-La regresión lineal se define como una **técnica estadística** utilizada para relacionar un conjunto de variables independientes y una variable de respuesta ajustando una ecuación lineal a los datos observados.
+Analizando la correlación de cada banda individual con $ln(SDD)$ provenientes de 46 muestras de agua tenemos que:
 
-## Step-wise linear regressión
+| Banda                     | R²     |
+|---------------------------|--------|
+| $\mathrm{B01}$            | -0.071 |
+| $\mathrm{B02}$ (blue)     | -0.051 |
+| $\mathrm{B03}$ (green)    | 0.033  |
+| $\mathrm{B04}$ (red)      | 0.294  |
+| $\mathrm{B05}$ (red edge) | 0.326  |
+| $\mathrm{B06}$            | 0.140  |
+| $\mathrm{B07}$            | 0.132  |
+| $\mathrm{B8A}$            | -0.002 |
+| $\mathrm{B11}$            | -0.025 |
+| $\mathrm{B12}$            | -0.034 |
+: Tabla 2: Correlaciones individuales. {.striped .hover}
 
-La regresión por pasos es un método que **examina iterativamente (repetidamente) la significancia estadística de cada variable independiente** en un modelo de regresión lineal. El método de selección progresiva parte de cero y añade cada nueva variable de forma incremental, comprobando la significancia estadística. El método de eliminación regresiva parte de un modelo completo con varias variables y luego elimina una para comprobar su importancia en relación con los resultados generales.
+Donde se observa una alta correlación con las bandas correspondientes a la longitud de onda del rojo, posiblemente por lo ya visto relacionado a la alta presencia de material particulado en gran parte de las aguas de estudio.
 
