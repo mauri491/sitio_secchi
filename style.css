@@ -8,3 +8,8 @@ table {
     white-space: nowrap;
     width: 100% !important;
 }
+
+li{
+    list-style-type: '- ';
+}
+  

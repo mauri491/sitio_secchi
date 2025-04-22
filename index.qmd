@@ -64,46 +64,62 @@ En la mayoría de los casos la relación entre $SDD$ y la intensidad de la luz e
 
 La correlación con la banda roja puede explicarse causalmente por la correlación positiva directa entre la reflectancia en el rojo y la carga bruta de partículas que induce la dispersión de partículas. De manera que mientras que la claridad del agua $(SDD)$ desciende, la intensidad en el rojo aumenta @Matthews.
 
-# Materiales y métodos
+Como referencia se presentan las propiedades de las distintas bandas de la plataforma espacial Sentinel-2:
 
-Al momento de publicación, se realizaron ensayos de sólidos suspendidos y turbidez así como mediciones in-situ de profundidad de disco de Secchi entre otras sobre 46 muestras tomados a lo largo de la transecta sobre el río Paraná para obtener las propiedades fisicoquímicas del agua. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en los puntos de muestreo.
+|  |  | Sentinel-2A | | Sentinel-2B | |
+|:--|--:|--:|--:|--:|--:|
+| **Banda** | **Resolución espacial (m)** | **Longitud de onda (nm)** | **Ancho de banda (nm)** | **Longitud de onda (nm)** | **Ancho de banda (nm)** |
+| $\mathrm{B01}$ (aerosol) | 60 | 442.7 | 20 | 442.3 | 20 |
+| $\mathrm{B02}$ (blue) | 10 | 492.7 | 65 | 492.3 | 65 |
+| $\mathrm{B03}$ (green) | 10 | 559.8 | 35 | 558.9 | 35 |
+| $\mathrm{B04}$ (red) | 10 | 664.6 | 38 | 664.9 | 31 |
+| $\mathrm{B05}$ (red edge) | 20 | 794.1 | 14 | 703.8 | 15 |
+| $\mathrm{B06}$ | 20 | 748.5 | 14 | 739.1 | 13 |
+| $\mathrm{B07}$ | 20 | 782.8 | 19 | 779.7 | 19 |
+| $\mathrm{B08}$ (NIR) | 10 | 832.8 | 105 | 832.9 | 104 |
+| $\mathrm{B8A}$ | 20 | 864.7 | 21 | 864.0 | 21 |
+| $\mathrm{B09}$ | 60 | 945.1 | 19 | 943.2 | 20 |
+| $\mathrm{B10}$ | 60 | 1373.5 | 29 | 1376.9 | 29 |
+| $\mathrm{B11}$ (SWIR 1) | 20 | 1613.7 | 90 | 1616.4 | 94 |
+| $\mathrm{B12}$ (SWIR 2) | 20 | 2292.4 | 174 | 2185.7 | 184 |
 
-# Estadísticas
+: Tabla 2: Propiedades de las bandas S2-MSI, para las plataformas S2A y S2B. {.striped .hover .responsive tbl-colwidths="[20,20,15,15,15,15]"}
+
+## Regresión lineal
+
+En estadística, la regresión lineal es un modelo matemático usado para aproximar la relación de dependencia entre una variable dependiente $Y$ con $m$ variables independientes $X_i$. Este modelo puede ser expresado como:
+
+$$ Y = \beta_0 +  \beta_1 X_1 + \cdots + \beta_m X_m$$
+
+donde:
+
+- $Y$ es la variable dependiente o variable de respuesta.
+- $X_1,X_2,...X_m$ son las variables explicativas, independientes o regresoras.
+- $\beta_0,\beta_1,\beta_2,...\beta_m$ son los parámetros del modelo, miden la influencia que las variables explicativas tienen sobre el regrediendo.
+
+### Selección de variables
+
+La seleccion de variables y características es el foco de mucha investigación. El objetivo de la selección de variables es mejorar el rendimiento de predicción de los predictores y proporcionar una mejor comprensión del proceso subyacente que generó los datos. 
 
 La identificación de las variables más relevantes para incluir o excluir en un modelo predictivo es un paso fundamental en cualquier investigación rigurosa, especialmente cuando se busca construir modelos con alto poder explicativo y capacidad de generalización. 
 
-Comprender qué variables contribuyen en mayor medida a la calidad de las predicciones permite no solo mejorar el desempeño del modelo, sino también interpretar con mayor claridad los fenómenos subyacentes que se están estudiando.
+Comprender qué variables contribuyen en mayor medida a la calidad de las predicciones permite no solo mejorar el desempeño del modelo, sino también interpretar con mayor claridad los fenómenos que se están estudiando.
 
-Si bien no existe un único método definitivo para determinar la importancia relativa de cada variable predictora, la literatura propone diversas estrategias que, en su mayoría, parten de un análisis exploratorio de los datos.
+No existe una forma segura de definir la importancia de una variable puesto que la utilidad de la misma depende del modelo implementado y de las demás variables con las que interactua: una variable que es completamente inutil por si misma puede resultar en una mejora del rendimiento significativa cuando es considerada junto con otras variables. 
 
-## Análisis exploratorio de los datos
+A pesar de las dificultades existen estrategias útiles para determinar un subconjunto de variables útiles para la predicción. Tal es el caso de los métodos *forward selection* y *backwards elimination*. En *forward selection*, las variables son progresivamente incorporadas, evaluando el modelo al paso de cada una, mientras que en *backwards elimination* uno empieza con el conjunto entero de variables y progresivamente elimina las menos prometedoras.
 
-Tener variables multicolineales dificulta la selección de las variables correctas para el análisis (dado que la varianza es compartida, es difícil determinar cuál variable debería ser su fuente causal), lo que lleva a soluciones subóptimas que solo podrían resolverse aumentando el número de observaciones involucradas en el análisis.
+Una forma de implementación de *forward selection* es por empezar por un modelo exento de variables independientes, pero cuyo término independiente sea la media de las variables de respuesta. A partir de este valor se calcula el residuo como la diferencia entre el valor verdadero $Y$ y el valor predecido $Y_{pred}$.
 
-Para determinar la forma y el número de predictores que se afectan entre sí, la herramienta adecuada es una matriz de correlación.
+$$r = Y - Y_{pred}$$
+
+Seguidamente, se computa la correlación entre cada variable independiente $X_i$ con el residuo y se incorpora al modelo la variable con la mayor correlación absoluta. El proceso se repite esta vez con las predicciones del nuevo modelo y se continua hasta alcanzar una desempeño deseado o un número determinado de variables.
 
 ![Fig. 1: Matriz de correlación entre las distintas bandas.](img/heatmap.svg){width=80%}
 
-Como se obserba en la Figura 1, existe una alta correlación entre distintas bandas. Esto impide evaluar de manera directa el efecto de la remoción de una de las variables al modelo debido a que su efecto se verá compensado por el aumento de la contribución por parte de otra variable correlacionada. 
+Una herramienta útil para ayudar en la selección de variables es una matriz de correlación. Dos variables prefectamente correlacionadas resultan redundantes en el sentido de que añadir ambas no aporta información adicional. Sin embargo, una correlación muy alta entre variables (o anti-correlación) no significa ausencia de complementariedad.
 
-Lo cierto es que, si bien el efecto de una variable se ve afectada por tanto por el modelo mismo y por las demás variables predictoras, las métricas como  el $R^2$ incremental o evaluar el $R^2$ de cada variable individualmente siguen siendo útiles para realizar una estimación. 
+# Materiales y métodos
 
-Analizando la correlación de cada banda individual con $ln(SDD)$ provenientes de 46 muestras de agua tenemos que:
-
-| Banda                     | R²     |
-|---------------------------|--------|
-| $\mathrm{B01}$            | -0.071 |
-| $\mathrm{B02}$ (blue)     | -0.051 |
-| $\mathrm{B03}$ (green)    | 0.033  |
-| $\mathrm{B04}$ (red)      | **0.294**  |
-| $\mathrm{B05}$ (red edge) | **0.326**  |
-| $\mathrm{B06}$            | **0.140**  |
-| $\mathrm{B07}$            | 0.132  |
-| $\mathrm{B8A}$            | -0.002 |
-| $\mathrm{B11}$            | -0.025 |
-| $\mathrm{B12}$            | -0.034 |
-
-: Tabla 2: Correlaciones individuales. {.striped .hover .responsive}
-
-Donde se observa una alta correlación con las bandas correspondientes a la longitud de onda del rojo, posiblemente por lo ya visto relacionado a la alta presencia de material particulado en gran parte de las aguas de estudio.
+Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi entre otros sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo.
 
