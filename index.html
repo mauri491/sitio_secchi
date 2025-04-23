@@ -3224,7 +3224,10 @@ window.Quarto = {
   <li><a href="#selección-de-variables" id="toc-selección-de-variables" class="nav-link" data-scroll-target="#selección-de-variables"><span class="header-section-number">1.3.1</span> Selección de variables</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#materiales-y-métodos" id="toc-materiales-y-métodos" class="nav-link" data-scroll-target="#materiales-y-métodos"><span class="header-section-number">2</span> Materiales y métodos</a></li>
+  <li><a href="#materiales-y-métodos" id="toc-materiales-y-métodos" class="nav-link" data-scroll-target="#materiales-y-métodos"><span class="header-section-number">2</span> Materiales y métodos</a>
+  <ul class="collapse">
+  <li><a href="#librerías" id="toc-librerías" class="nav-link" data-scroll-target="#librerías"><span class="header-section-number">2.1</span> Librerías</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -3514,7 +3517,7 @@ window.Quarto = {
 <p>La seleccion de variables y características es el foco de mucha investigación. El objetivo de la selección de variables es mejorar el rendimiento de predicción de los predictores y proporcionar una mejor comprensión del proceso subyacente que generó los datos.</p>
 <p>La identificación de las variables más relevantes para incluir o excluir en un modelo predictivo es un paso fundamental en cualquier investigación rigurosa, especialmente cuando se busca construir modelos con alto poder explicativo y capacidad de generalización.</p>
 <p>Comprender qué variables contribuyen en mayor medida a la calidad de las predicciones permite no solo mejorar el desempeño del modelo, sino también interpretar con mayor claridad los fenómenos que se están estudiando.</p>
-<p>No existe una forma segura de definir la importancia de una variable puesto que la utilidad de la misma depende del modelo implementado y de las demás variables con las que interactua: una variable que es completamente inutil por si misma puede resultar en una mejora del rendimiento significativa cuando es considerada junto con otras variables.</p>
+<p>No existe una forma segura de definir la importancia de una variable puesto que la utilidad de la misma depende del modelo implementado y de las demás variables con las que interactua: una variable que es completamente inutil por si misma puede resultar en una mejora del rendimiento significativa cuando es considerada junto con otras variables <span class="citation" data-cites="guyon2003introduction"><a href="#ref-guyon2003introduction" role="doc-biblioref">[3]</a></span>.</p>
 <p>A pesar de las dificultades existen estrategias útiles para determinar un subconjunto de variables útiles para la predicción. Tal es el caso de los métodos <em>forward selection</em> y <em>backwards elimination</em>. En <em>forward selection</em>, las variables son progresivamente incorporadas, evaluando el modelo al paso de cada una, mientras que en <em>backwards elimination</em> uno empieza con el conjunto entero de variables y progresivamente elimina las menos prometedoras.</p>
 <p>Una forma de implementación de <em>forward selection</em> es por empezar por un modelo exento de variables independientes, pero cuyo término independiente sea la media de las variables de respuesta. A partir de este valor se calcula el residuo como la diferencia entre el valor verdadero <span class="math inline">\(Y\)</span> y el valor predecido <span class="math inline">\(Y_{pred}\)</span>.</p>
 <p><span class="math display">\[r = Y - Y_{pred}\]</span></p>
@@ -3531,8 +3534,82 @@ window.Quarto = {
 </section>
 <section id="materiales-y-métodos" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Materiales y métodos</h1>
-<p>Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi entre otros sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo.</p>
+<p>Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo. Los datos recolectados se agrupan en una tabla de la siguiente manera:</p>
+<div class="table-responsive">
+<table class="table-striped table-hover table">
+<caption>Tabla 3: Datos recolectados.</caption>
+<colgroup>
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(\mathrm{SDD}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\mathrm{B01}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\mathrm{B02}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\cdots\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\mathrm{B12}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\mathrm{B8A}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0,1728</td>
+<td style="text-align: center;">0,1754</td>
+<td style="text-align: center;"><span class="math inline">\(\cdots\)</span></td>
+<td style="text-align: center;">0,1404</td>
+<td style="text-align: center;">0,1869</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">0,1497</td>
+<td style="text-align: center;">0,17022</td>
+<td style="text-align: center;"><span class="math inline">\(\cdots\)</span></td>
+<td style="text-align: center;">0,1113</td>
+<td style="text-align: center;">0,1567</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\cdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\vdots\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">125</td>
+<td style="text-align: center;">0,1571</td>
+<td style="text-align: center;">0,1563</td>
+<td style="text-align: center;"><span class="math inline">\(\cdots\)</span></td>
+<td style="text-align: center;">0,1419</td>
+<td style="text-align: center;">0,1436</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">135</td>
+<td style="text-align: center;">0,1503</td>
+<td style="text-align: center;">0,1591</td>
+<td style="text-align: center;"><span class="math inline">\(\cdots\)</span></td>
+<td style="text-align: center;">0,1420</td>
+<td style="text-align: center;">0,1454</td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="librerías" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="librerías"><span class="header-section-number">2.1</span> Librerías</h2>
+<p>Para regresión lineal se usan principalmente las librerías de <em>numpy</em>, <em>pandas</em> y <em>Scikit-learn</em>.</p>
+<ul>
+<li><strong>Scikit-learn</strong>: está en el corazón de las operaciones de ciencias de datos en Python. Ofrece módulos para procesamiento de datos, aprendizaje supervisado y no supervisado, selección y validación de modelos, y métricas de error.</li>
+<li><strong>pandas</strong>: especializada en la manipulación y el análisis de datos. Ofrece estructuras de datos y operaciones para manipular tablas numéricas y series temporales.</li>
+<li><strong>numpy</strong>: provee al usuario con arreglos multidimensionales, junto a un gran conjunto de funciones para operar en estos.</li>
+</ul>
 
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list">
@@ -3541,6 +3618,9 @@ window.Quarto = {
 </div>
 <div id="ref-Matthews" class="csl-entry" role="listitem">
 <div class="csl-left-margin">[2] </div><div class="csl-right-inline">M. Matthews, <span>«A current review of empirical procedures of remote sensing in Inland and near-coastal transitional waters»</span>, <em>International Journal of Remote Sensing - INT J REMOTE SENS</em>, vol. 32, pp. 1-45, nov. 2011, doi: <a href="https://doi.org/10.1080/01431161.2010.512947">10.1080/01431161.2010.512947</a>.</div>
+</div>
+<div id="ref-guyon2003introduction" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">I. Guyon y A. Elisseeff, <span>«An Introduction to Variable and Feature Selection»</span>, <em>Journal of Machine Learning Research</em>, vol. 3, pp. 1157-1182, 2003, Disponible en: <a href="https://www.jmlr.org/papers/volume3/guyon03a/guyon03a.pdf">https://www.jmlr.org/papers/volume3/guyon03a/guyon03a.pdf</a></div>
 </div>
 </div></section></div></main>
 <!-- /main column -->

@@ -105,7 +105,7 @@ La identificación de las variables más relevantes para incluir o excluir en un
 
 Comprender qué variables contribuyen en mayor medida a la calidad de las predicciones permite no solo mejorar el desempeño del modelo, sino también interpretar con mayor claridad los fenómenos que se están estudiando.
 
-No existe una forma segura de definir la importancia de una variable puesto que la utilidad de la misma depende del modelo implementado y de las demás variables con las que interactua: una variable que es completamente inutil por si misma puede resultar en una mejora del rendimiento significativa cuando es considerada junto con otras variables. 
+No existe una forma segura de definir la importancia de una variable puesto que la utilidad de la misma depende del modelo implementado y de las demás variables con las que interactua: una variable que es completamente inutil por si misma puede resultar en una mejora del rendimiento significativa cuando es considerada junto con otras variables @guyon2003introduction. 
 
 A pesar de las dificultades existen estrategias útiles para determinar un subconjunto de variables útiles para la predicción. Tal es el caso de los métodos *forward selection* y *backwards elimination*. En *forward selection*, las variables son progresivamente incorporadas, evaluando el modelo al paso de cada una, mientras que en *backwards elimination* uno empieza con el conjunto entero de variables y progresivamente elimina las menos prometedoras.
 
@@ -121,5 +121,22 @@ Una herramienta útil para ayudar en la selección de variables es una matriz de
 
 # Materiales y métodos
 
-Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi entre otros sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo.
+Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo. Los datos recolectados se agrupan en una tabla de la siguiente manera:
 
+| $\mathrm{SDD}$  | $\mathrm{B01}$  | $\mathrm{B02}$  | $\cdots$  | $\mathrm{B12}$  | $\mathrm{B8A}$  |
+| :--------------:| :--------------:| :--------------:| :--------:| :--------------:| :--------------:|
+| 10              | 0,1728          | 0,1754          | $\cdots$  | 0,1404          | 0,1869          |
+| 15              | 0,1497          | 0,17022         | $\cdots$  | 0,1113          | 0,1567          |
+| $\vdots$        | $\vdots$        | $\vdots$        | $\cdots$  | $\vdots$        | $\vdots$        |
+| 125             | 0,1571          | 0,1563          | $\cdots$  | 0,1419          | 0,1436          |
+| 135             | 0,1503          | 0,1591          | $\cdots$  | 0,1420          | 0,1454          |
+
+: Tabla 3: Datos recolectados. {.striped .hover .responsive}
+
+## Librerías
+
+Para regresión lineal se usan principalmente las librerías de *numpy*, *pandas* y *Scikit-learn*.
+
+- **Scikit-learn**: está en el corazón de las operaciones de ciencias de datos en Python. Ofrece módulos para procesamiento de datos, aprendizaje supervisado y no supervisado, selección y validación de modelos, y métricas de error.
+- **pandas**: especializada en la manipulación y el análisis de datos. Ofrece estructuras de datos y operaciones para manipular tablas numéricas y series temporales.
+- **numpy**: provee al usuario con arreglos multidimensionales, junto a un gran conjunto de funciones para operar en estos.
