@@ -113,7 +113,7 @@ Una forma de implementación de *forward selection* es por empezar por un modelo
 
 $$r = Y - Y_{pred}$$
 
-Seguidamente, se computa la correlación entre cada variable independiente $X_i$ con el residuo y se incorpora al modelo la variable con la mayor correlación absoluta. El proceso se repite esta vez con las predicciones del nuevo modelo y se continua hasta alcanzar una desempeño deseado o un número determinado de variables.
+Seguidamente, se computa la correlación entre cada variable independiente $X_i$ con el residuo y se incorpora al modelo la variable con la mayor correlación absoluta. El proceso se repite esta vez con las predicciones del nuevo modelo y se continua hasta alcanzar una desempeño deseado o un número determinado de variables. Este método fue utilizado satisfactoriamente en investigaciones previas @BONANSEA2019102265.
 
 ![Fig. 1: Matriz de correlación entre las distintas bandas.](img/heatmap.svg){width=80%}
 
@@ -135,7 +135,7 @@ Al momento de publicación se realizaron mediciones in-situ de profundidad de di
 
 ## Librerías
 
-Para regresión lineal se usan principalmente las librerías de *numpy*, *pandas* y *Scikit-learn*.
+Para regresión lineal se usan principalmente las librerías de Python *numpy*, *pandas* y *Scikit-learn*.
 
 - **Scikit-learn**: está en el corazón de las operaciones de ciencias de datos en Python. Ofrece módulos para procesamiento de datos, aprendizaje supervisado y no supervisado, selección y validación de modelos, y métricas de error.
 - **pandas**: especializada en la manipulación y el análisis de datos. Ofrece estructuras de datos y operaciones para manipular tablas numéricas y series temporales.
