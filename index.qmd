@@ -7,6 +7,7 @@ format:
     embed-resources: true
     crossrefs-hover: false
     css: style.css
+    code-copy: true
     lang: es
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
@@ -119,9 +120,64 @@ Seguidamente, se computa la correlación entre cada variable independiente $X_i$
 
 Una herramienta útil para ayudar en la selección de variables es una matriz de correlación. Dos variables prefectamente correlacionadas resultan redundantes en el sentido de que añadir ambas no aporta información adicional. Sin embargo, una correlación muy alta entre variables (o anti-correlación) no significa ausencia de complementariedad.
 
-# Materiales y métodos
+### Generación de características lineales y no lineales
 
-Al momento de publicación se realizaron mediciones in-situ de profundidad de disco de Secchi sobre 46 puntos a lo largo de la transecta sobre el río Paraná. Utilizando los datos provistos por la plataforma espacial Sentinel-2 se accede a las características espectrales del agua en dichos puntos de muestreo. Los datos recolectados se agrupan en una tabla de la siguiente manera:
+Incluir nuevas variables a partir de las originales, como productos, cocientes o transformaciones no lineales (por ejemplo, logaritmos, o raíces cuadradas) permite capturar relaciones más complejas entre las variables independientes y la variable objetivo. Por ejemplo, si se dispone de datos espectrales, pueden construirse razones entre bandas (band ratios) o índices espectrales que resalten ciertas propiedades físicas del fenómeno estudiado. Estas nuevas características permiten al modelo lineal aproximar mejor la relación entre los datos y la salida, especialmente cuando la relación real no es perfectamente lineal.
+
+# Regresión Lineal
+
+La construcción del modelo se lleva a cabo utilizando la versión de Python 3.12 y las librerías previamente especificadas, detallando la función de cada pieza de código, observaciones, avances y descubrimientos.
+
+## Librerías
+
+Para regresión lineal se usan principalmente las librerías de Python *numpy*, *pandas* y *Scikit-learn*.
+
+- **Scikit-learn**: está en el corazón de las operaciones de ciencias de datos en Python. Ofrece módulos para procesamiento de datos, aprendizaje supervisado y no supervisado, selección y validación de modelos, y métricas de error.
+- **Pandas**: especializada en la manipulación y el análisis de datos. Ofrece estructuras de datos y operaciones para manipular tablas numéricas y series temporales.
+- **NumPy**: provee al usuario con arreglos multidimensionales, junto a un gran conjunto de funciones para operar en estos.
+
+## Lectura de datos
+
+Para la carga, lectura y manipulación de la información la librería *Pandas* permite convertir un archivo .csv en un *DataFrame*, estructura de datos que facilita la manipulación de estos. El fragmento de código siguiente agrupa los valores de $SDD$ con los valores de reflectancia a diferentes longitudes de onda para los cuales coinciden fecha, latitud y longitud y crea un nuevo *DataFrame*.
+
+```{python}
+import pandas as pd
+
+# Rutas a los archivos CSV
+archivo_reflectancias = "datos\\base_de_datos_gis.csv"  # contiene: fecha,punto,pixel,banda,reflect,longitud,latitud
+archivo_parametros = "datos\\base_de_datos_lab.csv"     # contiene: fecha,longitud,latitud,param,valor
+
+# Leer los archivos
+df_reflect = pd.read_csv(archivo_reflectancias)
+df_param = pd.read_csv(archivo_parametros)
+
+# Filtrar los parámetros "secchi"
+df_secchi = df_param[df_param["param"].str.lower() == "secchi"]
+
+# Merge por fecha y coordenadas
+merged = pd.merge(
+    df_secchi,
+    df_reflect,
+    on=["fecha", "latitud", "longitud"],
+    how="inner"
+)
+
+# Pivotear la tabla para poner bandas como columnas
+tabla_final = merged.pivot_table(
+    index=["param", "fecha", "longitud", "latitud", "valor"], 
+    columns="banda",
+    values="reflect"
+).reset_index()
+
+# Reordenar columnas: param | B01 | B02 | ... | B8A
+bandas = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08', 'B11', 'B12', 'B8A']
+columnas_finales = ['valor'] + bandas
+
+# Crear Tabla final
+df = tabla_final[columnas_finales]
+```
+
+El *DataFrame* obtenido se asemeja a la siguiente tabla:
 
 | $\mathrm{SDD}$  | $\mathrm{B01}$  | $\mathrm{B02}$  | $\cdots$  | $\mathrm{B12}$  | $\mathrm{B8A}$  |
 | :--------------:| :--------------:| :--------------:| :--------:| :--------------:| :--------------:|
@@ -131,12 +187,140 @@ Al momento de publicación se realizaron mediciones in-situ de profundidad de di
 | 125             | 0,1571          | 0,1563          | $\cdots$  | 0,1419          | 0,1436          |
 | 135             | 0,1503          | 0,1591          | $\cdots$  | 0,1420          | 0,1454          |
 
-: Tabla 3: Datos recolectados. {.striped .hover .responsive}
+: Tabla 3: DataFrame de los datos recolectados. {.striped .hover .responsive}
 
-## Librerías
+## Análisis de los datos
 
-Para regresión lineal se usan principalmente las librerías de Python *numpy*, *pandas* y *Scikit-learn*.
+La relación no lineal entre la penetración de la luz y la profundidad de disco de Secchi fue ya descrita por diversos autores que hallan una mejor descripción de esta como una de tipo logaritmica @modisComparison. Con las bandas B04, B05 y B06 verificamos esta relación:
 
-- **Scikit-learn**: está en el corazón de las operaciones de ciencias de datos en Python. Ofrece módulos para procesamiento de datos, aprendizaje supervisado y no supervisado, selección y validación de modelos, y métricas de error.
-- **pandas**: especializada en la manipulación y el análisis de datos. Ofrece estructuras de datos y operaciones para manipular tablas numéricas y series temporales.
-- **numpy**: provee al usuario con arreglos multidimensionales, junto a un gran conjunto de funciones para operar en estos.
+```{python}
+#| echo: false
+import numpy as np
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(ncols=2,nrows = 3, figsize=(8,7))
+
+SDD = df.iloc[24:31,0]
+log_SDD = np.log(SDD)
+B04 = df.iloc[24:31,4]
+B05 = df.iloc[24:31,5]
+B06 = df.iloc[24:31,6]
+
+# B04 SDD
+ax[0,0].scatter(B04, SDD, color="#17A77E", alpha=0.7)
+ax[0,0].plot([min(B04),max(B04)],[max(SDD),min(SDD)], color='gray', linestyle='--')
+ax[0,0].set(ylabel="SDD")
+
+# B04 LOG(SDD)
+ax[0,1].scatter(B04, log_SDD, color="#9D50A6", alpha=0.7)
+ax[0,1].plot([min(B04),max(B04)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[0,1].set(ylabel="ln(SDD)")
+
+# B05
+ax[1,0].scatter(B05, SDD, color="#17A77E", alpha=0.7)
+ax[1,0].plot([min(B05),max(B05)],[max(SDD),min(SDD)], color='gray', linestyle='--')
+ax[1,0].set(ylabel="SDD")
+
+# B05 LOG(SDD)
+ax[1,1].scatter(B05, log_SDD, color="#9D50A6", alpha=0.7)
+ax[1,1].plot([min(B05),max(B05)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[1,1].set(ylabel="ln(SDD)")
+
+# B06
+ax[2,0].scatter(B06, SDD, color="#17A77E", alpha=0.7)
+ax[2,0].plot([min(B06),max(B06)],[max(SDD),min(SDD)], color='gray', linestyle='--')
+ax[2,0].set(ylabel="SDD")
+
+# B06 LOG(SDD)
+ax[2,1].scatter(B06, log_SDD, color="#9D50A6", alpha=0.7)
+ax[2,1].plot([min(B06),max(B06)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[2,1].set(ylabel="ln(SDD)")
+
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.2)
+plt.show()
+
+```
+
+## Modelo inicial
+
+Resulta sencillo generar un modelo de regresión lineal por el método de Mínimos Cuadrados Ordinarios con la librería ```sklearn``` y funciones de interés.
+
+```{python}
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Separación de datos en entrenamiento y validación
+X = df.drop(columns = 'valor')
+y = df['valor'].values
+
+X_train, X_test, y_train, y_test = train_test_split(
+  X, y, test_size=20, shuffle=True, random_state=42
+)
+
+# Modelo y ajuste
+regressor = LinearRegression().fit(X_train, y_train)
+
+# Métricas de desempeño
+y_pred = regressor.predict(X_test)
+p_rmse = mean_squared_error(y_test, y_pred)
+p_r2 = r2_score(y_test, y_pred)
+```
+
+::: {.callout-note icon="false" title="Métricas de desempeño"}
+
+El error cuadrático medio es: `{python} round(p_rmse,2)`.
+
+El coeficiente de determinación (R²) es: `{python} round(p_r2,2)`.
+
+:::
+
+La correlación puede visualizarse de mejor manera utilizando la librería ``matplotlib``.
+
+```{python}
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
+
+# Entrenamiento
+ax[0].scatter(y_train, regressor.predict(X_train), color="#17A77E", alpha=0.7, label="Predicciones")
+ax[0].plot([y_train.min(), y_train.max()], [y_train.min(), y_train.max()], 'k--', lw=2, label="Ideal")
+ax[0].set(xlabel="Valor real", ylabel="Predicción", title="Conjunto de entrenamiento")
+ax[0].legend()
+
+# Validación
+ax[1].scatter(y_test, y_pred, color="#9D50A6", alpha=0.7, label="Predicciones")
+ax[1].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2, label="Ideal")
+ax[1].set(xlabel="Valor real", ylabel="Predicción", title="Conjunto de validación")
+ax[1].legend()
+
+fig.suptitle("Regresión lineal: Valor real vs. Predicción")
+plt.tight_layout()
+plt.show()
+```
+
+Se obtiene un mejor resultado linearizando los valores de $SDD$ utilizando la librería `numpy`.
+
+```{python}
+import numpy as np
+y = np.log(df['valor'].values)
+
+X_train, X_test, y_train, y_test = train_test_split(
+  X, y, test_size=20, shuffle=True, random_state=42
+)
+
+# Modelo y ajuste
+regressor = LinearRegression().fit(X_train, y_train)
+
+# Métricas de desempeño
+y_pred = regressor.predict(X_test)
+p_rmse = mean_squared_error(y_test, y_pred)
+p_r2 = r2_score(y_test, y_pred)
+```
+
+::: {.callout-note icon="false" title="Métricas de desempeño"}
+
+El error cuadrático medio es: `{python} round(p_rmse,2)`.
+
+El coeficiente de determinación (R²) es: `{python} round(p_r2,2)`.
+
+:::
