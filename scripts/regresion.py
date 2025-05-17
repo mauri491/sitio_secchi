@@ -33,7 +33,6 @@ class RegresionLineal:
     def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42):
         """
         Evalúa un modelo de regresión usando validación cruzada.
-        Devuelve métricas: R² y RMSE.
         """
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
         r2_scores, rmse_scores = [], []
@@ -97,7 +96,6 @@ class RegresionLineal:
     def ajustar_modelo_final(self, log=False, extendido=False):
         """
         Ajusta el modelo final con las variables seleccionadas y guarda el modelo.
-        Devuelve los coeficientes y el intercepto.
         """
         if not self.variables_seleccionadas:
             raise ValueError("No hay variables seleccionadas. Ejecutar primero 'stepwise()'.")
