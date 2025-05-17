@@ -184,18 +184,20 @@ El *DataFrame* obtenido se asemeja a la siguiente tabla:
 | 10              | 0,1728          | 0,1754          | $\cdots$  | 0,1404          | 0,1869          |
 | 15              | 0,1497          | 0,17022         | $\cdots$  | 0,1113          | 0,1567          |
 | $\vdots$        | $\vdots$        | $\vdots$        | $\cdots$  | $\vdots$        | $\vdots$        |
-| 125             | 0,1571          | 0,1563          | $\cdots$  | 0,1419          | 0,1436          |
+| 125             | 0,1571          | 0,1563          | $\cdots$  | 0,1419          | 0,1436          |scr
 | 135             | 0,1503          | 0,1591          | $\cdots$  | 0,1420          | 0,1454          |
 
 : Tabla 3: DataFrame de los datos recolectados. {.striped .hover .responsive}
 
 ## Análisis de los datos
 
-La relación no lineal entre la penetración de la luz y la profundidad de disco de Secchi fue ya descrita por diversos autores que hallan una mejor descripción de esta como una de tipo logaritmica @modisComparison. Con las bandas B04, B05 y B06 verificamos esta relación:
+La relación no lineal entre la penetración de la luz y la profundidad de disco de Secchi fue ya descrita por diversos autores que hallan una mejor descripción de esta como una de tipo logaritmica @modisComparison. Se verifica este comportamiento con las bandas B04, B05 y B06:
 
 ```{python}
 #| echo: false
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots(ncols=2,nrows = 3, figsize=(8,7))
 
@@ -211,9 +213,12 @@ ax[0,0].plot([min(B04),max(B04)],[max(SDD),min(SDD)], color='gray', linestyle='-
 ax[0,0].set(ylabel="SDD")
 
 # B04 LOG(SDD)
+lm = LinearRegression().fit(B04.values.reshape(-1,1), log_SDD)
 ax[0,1].scatter(B04, log_SDD, color="#9D50A6", alpha=0.7)
-ax[0,1].plot([min(B04),max(B04)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[0,1].plot([min(B04),max(B04)],[lm.predict([[min(B04)]]),lm.predict([[max(B04)]])], color='gray', linestyle='--')
 ax[0,1].set(ylabel="ln(SDD)")
+ax[0,1].text(0.01,0.02,f'ln(SDD) = {round(lm.coef_[0],2)} • B04 + {round(lm.intercept_,2)}', transform=ax[0,1].transAxes)
+ax[0,1].text(0.01,0.09,f'R² = {round(r2_score(log_SDD,lm.predict(B04.values.reshape(-1,1))),2)}', transform=ax[0,1].transAxes)
 
 # B05
 ax[1,0].scatter(B05, SDD, color="#17A77E", alpha=0.7)
@@ -221,9 +226,12 @@ ax[1,0].plot([min(B05),max(B05)],[max(SDD),min(SDD)], color='gray', linestyle='-
 ax[1,0].set(ylabel="SDD")
 
 # B05 LOG(SDD)
+lm = LinearRegression().fit(B05.values.reshape(-1,1), log_SDD)
 ax[1,1].scatter(B05, log_SDD, color="#9D50A6", alpha=0.7)
-ax[1,1].plot([min(B05),max(B05)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[1,1].plot([min(B05),max(B05)],[lm.predict([[min(B05)]]),lm.predict([[max(B05)]])], color='gray', linestyle='--')
 ax[1,1].set(ylabel="ln(SDD)")
+ax[1,1].text(0.01,0.02,f'ln(SDD) = {round(lm.coef_[0],2)} • B05 + {round(lm.intercept_,2)}', transform=ax[1,1].transAxes)
+ax[1,1].text(0.01,0.09,f'R² = {round(r2_score(log_SDD,lm.predict(B05.values.reshape(-1,1))),2)}', transform=ax[1,1].transAxes)
 
 # B06
 ax[2,0].scatter(B06, SDD, color="#17A77E", alpha=0.7)
@@ -231,9 +239,12 @@ ax[2,0].plot([min(B06),max(B06)],[max(SDD),min(SDD)], color='gray', linestyle='-
 ax[2,0].set(ylabel="SDD")
 
 # B06 LOG(SDD)
+lm = LinearRegression().fit(B06.values.reshape(-1,1), log_SDD)
 ax[2,1].scatter(B06, log_SDD, color="#9D50A6", alpha=0.7)
-ax[2,1].plot([min(B06),max(B06)],[max(log_SDD),min(log_SDD)], color='gray', linestyle='--')
+ax[2,1].plot([min(B06),max(B06)],[lm.predict([[min(B06)]]),lm.predict([[max(B06)]])], color='gray', linestyle='--')
 ax[2,1].set(ylabel="ln(SDD)")
+ax[2,1].text(0.01,0.02,f'ln(SDD) = {round(lm.coef_[0],2)} • B06 + {round(lm.intercept_,2)}', transform=ax[2,1].transAxes)
+ax[2,1].text(0.01,0.09,f'R² = {round(r2_score(log_SDD,lm.predict(B06.values.reshape(-1,1))),2)}', transform=ax[2,1].transAxes)
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.2)
@@ -241,86 +252,66 @@ plt.show()
 
 ```
 
-## Modelo inicial
-
-Resulta sencillo generar un modelo de regresión lineal por el método de Mínimos Cuadrados Ordinarios con la librería ```sklearn``` y funciones de interés.
+## Desarrollo del modelo
 
 ```{python}
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+#| echo: false
+import sys
+sys.path.append("scripts")  # only if your .py is not in the same folder
+from regresion import *
 
-# Separación de datos en entrenamiento y validación
-X = df.drop(columns = 'valor')
-y = df['valor'].values
-
-X_train, X_test, y_train, y_test = train_test_split(
-  X, y, test_size=20, shuffle=True, random_state=42
-)
-
-# Modelo y ajuste
-regressor = LinearRegression().fit(X_train, y_train)
-
-# Métricas de desempeño
-y_pred = regressor.predict(X_test)
-p_rmse = mean_squared_error(y_test, y_pred)
-p_r2 = r2_score(y_test, y_pred)
+X = df.drop(columns='valor')
+y = df['valor']
 ```
 
-::: {.callout-note icon="false" title="Métricas de desempeño"}
+Para el desarrollo del modelo se implementó la clase ```RegresionLineal```, que contiene el código necesario para la construcción y selección de variables así como para la validación cruzada del modelo. La misma requiere unicamente de los arrays correspondientes a la variable objetivo y a las características con las que estimarla.
 
-El error cuadrático medio es: `{python} round(p_rmse,2)`.
+Generar un modelo incial sin la construcción de variables adicionales y sin alterar la variable objetivo resulta sencillo:
+```{python}
+Modelo = RegresionLineal(X,y)
+Modelo.stepwise()
+```
 
-El coeficiente de determinación (R²) es: `{python} round(p_r2,2)`.
-
-:::
-
-La correlación puede visualizarse de mejor manera utilizando la librería ``matplotlib``.
+Los coeficientes resultan:
 
 ```{python}
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
-
-# Entrenamiento
-ax[0].scatter(y_train, regressor.predict(X_train), color="#17A77E", alpha=0.7, label="Predicciones")
-ax[0].plot([y_train.min(), y_train.max()], [y_train.min(), y_train.max()], 'k--', lw=2, label="Ideal")
-ax[0].set(xlabel="Valor real", ylabel="Predicción", title="Conjunto de entrenamiento")
-ax[0].legend()
-
-# Validación
-ax[1].scatter(y_test, y_pred, color="#9D50A6", alpha=0.7, label="Predicciones")
-ax[1].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2, label="Ideal")
-ax[1].set(xlabel="Valor real", ylabel="Predicción", title="Conjunto de validación")
-ax[1].legend()
-
-fig.suptitle("Regresión lineal: Valor real vs. Predicción")
-plt.tight_layout()
-plt.show()
+Modelo.ajustar_modelo_final()
 ```
 
-Se obtiene un mejor resultado linearizando los valores de $SDD$ utilizando la librería `numpy`.
+Mientras que la correlación se visualiza de la siguiente manera:
 
 ```{python}
-import numpy as np
-y = np.log(df['valor'].values)
-
-X_train, X_test, y_train, y_test = train_test_split(
-  X, y, test_size=20, shuffle=True, random_state=42
-)
-
-# Modelo y ajuste
-regressor = LinearRegression().fit(X_train, y_train)
-
-# Métricas de desempeño
-y_pred = regressor.predict(X_test)
-p_rmse = mean_squared_error(y_test, y_pred)
-p_r2 = r2_score(y_test, y_pred)
+Modelo.graficar()
 ```
 
-::: {.callout-note icon="false" title="Métricas de desempeño"}
+Esta correlación no es necesariamente mala, pero puede mejorarse mediante la implementación de las propuestas ya estudiadas como lo son la generación de cocientes entre características y la linealización de la variable objetivo:
 
-El error cuadrático medio es: `{python} round(p_rmse,2)`.
+```{python}
+Modelo.stepwise(log = True, extendido = True)
+```
 
-El coeficiente de determinación (R²) es: `{python} round(p_r2,2)`.
+```{python}
+#| echo: false
+#| output: false
+Modelo.ajustar_modelo_final(log = True, extendido = True)
+```
 
-:::
+```{python}
+Modelo.graficar(log = True, extendido = True)
+```
+
+Observamos que el modelo obtiene una notable mejoría con el uso de sólo cocientes como variables predictivas. Resta entonces, probar utilizar una cantidad mayor o menor de variables y analizar cómo esto afecta a la predicción.
+
+```{python}
+Modelo.stepwise(log = True, extendido = True, max_vars = 3)
+```
+```{python}
+#| echo: false
+#| output: false
+Modelo.ajustar_modelo_final(log = True, extendido = True)
+```
+
+```{python}
+#| echo: false
+Modelo.graficar(log = True, extendido = True)
+```
