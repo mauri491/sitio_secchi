@@ -3589,7 +3589,7 @@ window.Quarto = {
 <section id="lectura-de-datos" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="lectura-de-datos"><span class="header-section-number">2.2</span> Lectura de datos</h2>
 <p>Para la carga, lectura y manipulación de la información la librería <em>Pandas</em> permite convertir un archivo .csv en un <em>DataFrame</em>, estructura de datos que facilita la manipulación de estos. El fragmento de código siguiente agrupa los valores de <span class="math inline">\(SDD\)</span> con los valores de reflectancia a diferentes longitudes de onda para los cuales coinciden fecha, latitud y longitud y crea un nuevo <em>DataFrame</em>.</p>
-<div id="a9905637" class="cell" data-execution_count="1">
+<div id="79eee32a" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Rutas a los archivos CSV</span></span>
@@ -3695,7 +3695,7 @@ window.Quarto = {
 <section id="análisis-de-los-datos" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="análisis-de-los-datos"><span class="header-section-number">2.3</span> Análisis de los datos</h2>
 <p>La relación no lineal entre la penetración de la luz y la profundidad de disco de Secchi fue ya descrita por diversos autores que hallan una mejor descripción de esta como una de tipo logaritmica <span class="citation" data-cites="modisComparison"><a href="#ref-modisComparison" role="doc-biblioref">[5]</a></span>. Se verifica este comportamiento con las bandas B04, B05 y B06:</p>
-<div id="c3f448c9" class="cell" data-execution_count="2">
+<div id="2ffc7852" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -3709,7 +3709,7 @@ window.Quarto = {
 <h2 data-number="2.4" class="anchored" data-anchor-id="desarrollo-del-modelo"><span class="header-section-number">2.4</span> Desarrollo del modelo</h2>
 <p>Para el desarrollo del modelo se implementó la clase <code>RegresionLineal</code>, que contiene el código necesario para la construcción y selección de variables así como para la validación cruzada del modelo. La misma requiere unicamente de los arrays correspondientes a la variable objetivo y a las características con las que estimarla.</p>
 <p>Generar un modelo incial sin la construcción de variables adicionales y sin alterar la variable objetivo resulta sencillo:</p>
-<div id="20898662" class="cell" data-execution_count="4">
+<div id="521c0368" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Modelo <span class="op">=</span> RegresionLineal(X,y)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Modelo.stepwise()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -3722,7 +3722,7 @@ Paso 5: Se añade &#39;B04&#39; — R²: 0.6090, RMSE: 25.1743</code></pre>
 </div>
 </div>
 <p>Los coeficientes resultan:</p>
-<div id="3aaade8b" class="cell" data-execution_count="5">
+<div id="e96f61cc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Modelo.ajustar_modelo_final()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -3737,7 +3737,7 @@ Intercepto: 67.8227</code></pre>
 </div>
 </div>
 <p>Mientras que la correlación se visualiza de la siguiente manera:</p>
-<div id="e9016ee9" class="cell" data-execution_count="6">
+<div id="6fc1f71e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Modelo.graficar()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -3748,7 +3748,7 @@ Intercepto: 67.8227</code></pre>
 </div>
 </div>
 <p>Esta correlación no es necesariamente mala, pero puede mejorarse mediante la implementación de las propuestas ya estudiadas como lo son la generación de cocientes entre características y la linealización de la variable objetivo:</p>
-<div id="1222d755" class="cell" data-execution_count="7">
+<div id="4276308d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Modelo.stepwise(log <span class="op">=</span> <span class="va">True</span>, extendido <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Paso 0: Solo la media  — R²: -0.1490, RMSE: 0.4131
@@ -3759,7 +3759,7 @@ Paso 4: Se añade &#39;B06/B07&#39; — R²: 0.9244, RMSE: 0.1035
 Paso 5: Se añade &#39;B04/B12&#39; — R²: 0.9301, RMSE: 0.1018</code></pre>
 </div>
 </div>
-<div id="077e4809" class="cell" data-execution_count="9">
+<div id="a51b6bae" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Modelo.graficar(log <span class="op">=</span> <span class="va">True</span>, extendido <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -3769,8 +3769,8 @@ Paso 5: Se añade &#39;B04/B12&#39; — R²: 0.9301, RMSE: 0.1018</code></pre>
 </div>
 </div>
 </div>
-<p>Observamos que el modelo obtiene una notable mejoría con el uso de sólo cocientes como variables predictivas. Resta entonces, probar utilizar una cantidad mayor o menor de variables y analizar como esto afecta a la predicción.</p>
-<div id="41051c35" class="cell" data-execution_count="10">
+<p>Observamos que el modelo obtiene una notable mejoría con el uso de sólo cocientes como variables predictivas. Resta entonces, probar utilizar una cantidad mayor o menor de variables y analizar cómo esto afecta a la predicción.</p>
+<div id="cf1e3ca6" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Modelo.stepwise(log <span class="op">=</span> <span class="va">True</span>, extendido <span class="op">=</span> <span class="va">True</span>, max_vars <span class="op">=</span> <span class="dv">3</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Paso 0: Solo la media  — R²: -0.1490, RMSE: 0.4131
@@ -3779,7 +3779,7 @@ Paso 2: Se añade &#39;B11/B01&#39; — R²: 0.9062, RMSE: 0.1090
 Paso 3: Se añade &#39;B03/B05&#39; — R²: 0.9152, RMSE: 0.1074</code></pre>
 </div>
 </div>
-<div id="220a0d45" class="cell" data-execution_count="12">
+<div id="a2317e92" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
