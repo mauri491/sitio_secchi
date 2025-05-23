@@ -316,7 +316,7 @@ Los coeficientes y ordenada resultantes de considerar a las primeras dos variabl
 ```{python}
 #| echo: false
 #| output: false
-Modelo.stepwise(max_vars = 3, log_y = True, log_X = True, cocientes = True)
+Modelo.stepwise(max_vars = 2, log_y = True, log_X = True, cocientes = True)
 ```
 
 ```{python}
