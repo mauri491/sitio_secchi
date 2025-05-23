@@ -6,37 +6,45 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_squared_error
 
-
 class RegresionLineal:
     def __init__(self, X, y):
         self.X = X
         self.y = y
-        self.X_extendido = pd.concat([X, self.generar_combinaciones()], axis=1)
-        self.modelo_final = None
-        self.variables_seleccionadas = [] 
-        
+        self.y_real = None
+        self.y_est = None
+        self.modelo = None
+        self.variables = None
+        self.logaritmos_X, self.cocientes_X = self.generar_combinaciones()
+
     def generar_combinaciones(self):
         """
-        Genera cocientes entre las combinaciones de las distintas bandas (columnas).
+        Genera cocientes entre las combinaciones de las distintas bandas y logarimos (base 10) de estas (columnas).
         """
         X = self.X
         cocientes = {}
+        logaritmos = {}
         columnas = X.columns
+        
         for i in range(X.shape[1]):
             for j in range(X.shape[1]):
                 if j != i:
                     col1, col2 = columnas[i], columnas[j]
                     q = X[col1] / X[col2].replace(0, np.nan)
-                    cocientes[f'{col1}/{col2}'] = q
-        return pd.DataFrame(cocientes)
+                    cocientes[f'{col1}/{col2}'] = q # Genera cocientes
+
+        for i in range(X.shape[1]):
+            logaritmos[f'log({columnas[i]})'] = np.log10(X[columnas[i]]) # Genera logaritmos
+
+        return pd.DataFrame(logaritmos), pd.DataFrame(cocientes)
 
     def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42):
         """
         Evalúa un modelo de regresión usando validación cruzada.
         """
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-        r2_scores, rmse_scores = [], []
-
+        puntaje_r2, puntaje_rmse, puntaje_r2_adj = [], [], []
+        modelo = None
+        
         for train_idx, test_idx in kf.split(X):
             X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
             y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
@@ -46,35 +54,66 @@ class RegresionLineal:
                 modelo.fit(X_train[variables], y_train)
                 y_pred = modelo.predict(X_test[variables])
             else:
-                y_pred = np.full_like(y_test, y_train.mean(), dtype=float)
+                y_pred = np.full_like(y_test, y_train.mean(), dtype=float) # Si todavía no se agregaron variables, devolver la media como predicción
+        
+            # Cálculo de R² y RMSE
+            r2 = r2_score(y_test, y_pred)
+            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
-            r2_scores.append(r2_score(y_test, y_pred))
-            rmse_scores.append(np.sqrt(mean_squared_error(y_test, y_pred)))
+            # Cálculo de R² ajustado
+            n_fold = len(y_test) # Número de observaciones
+            p = len(variables) if variables else 0 # Número de variables predictoras
+            if n_fold > p + 1: # Si el número de variables predictoras es igual al número de observaciones, no puede calcularse el R² ajustado
+                r2_ajustado = 1 - (1 - r2) * (n_fold - 1) / (n_fold - p - 1)
+            else:
+                r2_ajustado = np.nan
+
+            # Añado los valores a las listas
+            puntaje_r2.append(r2)
+            puntaje_rmse.append(rmse)
+            puntaje_r2_adj.append(r2_ajustado)
 
         return {
-            'r2': np.mean(r2_scores),
-            'rmse': np.mean(rmse_scores)
+            'r2': np.mean(puntaje_r2),
+            'rmse': np.mean(puntaje_rmse),
+            'r2_adj': np.mean(puntaje_r2_adj)
         }
 
-    def stepwise(self, max_vars=5, n_splits=5, random_state=42, log=False, extendido=False):
+    def stepwise(self, max_vars=5, n_splits=5, random_state=42, log_y = False, log_X = False, cocientes = False):
         """
         Selección paso a paso (stepwise) usando validación cruzada.
         Se elige la mejor variable en cada paso basada en R².
         """
-        y = np.log10(self.y) if log else self.y
-        X = self.X_extendido if extendido else self.X
+        y = self.y
+        X = self.X
+        if log_y:
+            y = np.log(y)
+        if log_X:
+            X = pd.concat([X, self.logaritmos_X], axis=1)
+        if cocientes:
+            X = pd.concat([X, self.cocientes_X], axis=1)
 
-        variables_seleccionadas = []
-        variables_restantes = list(X.columns)
+        variables_seleccionadas = [] 
+        variables_restantes = list(X.columns) # Todas las variables
+
+        # Lista para guardar los resultados
+        resultados = []
 
         # Paso 0: predicción con la media
         metricas_base = self.evaluar_modelo(X, y, [], n_splits, random_state)
-        print(f"Paso 0: Solo la media  — R²: {metricas_base['r2']:.4f}, RMSE: {metricas_base['rmse']:.4f}")
+        resultados.append({
+        'Paso': 0,
+        'Variable': 'Ninguna',
+        'R²': round(metricas_base['r2'], 4),
+        'ADJ-R²': round(metricas_base['r2_adj'], 4),
+        'RMSE': round(metricas_base['rmse'], 4)
+    })
 
-        for paso in range(1, max_vars + 1):
+        # Paso X: agregar una variable
+        for paso in range(1, max_vars + 1): # Empieza desde 1 hasta max_vars + 1 para no repetir el 0 en el print
             mejor_variable = None
             mejores_metricas = None
-            mejor_r2 = -np.inf
+            mejor_r2 = -np.inf # Para permitir casos donde la correlación sea negativa
 
             for var in variables_restantes:
                 candidatos = variables_seleccionadas + [var]
@@ -88,57 +127,47 @@ class RegresionLineal:
             variables_seleccionadas.append(mejor_variable)
             variables_restantes.remove(mejor_variable)
 
-            print(f"Paso {paso}: Se añade '{mejor_variable}' — R²: {mejores_metricas['r2']:.4f}, RMSE: {mejores_metricas['rmse']:.4f}")
+            resultados.append({
+            'Paso': paso,
+            'Variable': mejor_variable,
+            'R²': round(mejores_metricas['r2'], 4),
+            'ADJ-R²': round(mejores_metricas['r2_adj'], 4),
+            'RMSE': round(mejores_metricas['rmse'], 4)
+        })
+   
+        self.variables = variables_seleccionadas # Esto lo guardo para después armar la tabla de coeficientes
+        self.modelo = LinearRegression() # Guardo el modelo final
+        self.modelo.fit(X[variables_seleccionadas],y)
+        self.y_real = y  # Para armar las gráficas
+        self.y_est = self.modelo.predict(X[variables_seleccionadas])
+        return pd.DataFrame(resultados)
 
-        # Guardo las variables seleccionadas
-        self.variables_seleccionadas = variables_seleccionadas
+    def coeficientes(self):
+        if self.modelo is None:
+            raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
+        
+        coef_df = pd.DataFrame({
+            'Variable': self.variables,
+            'Coeficiente': self.modelo.coef_
+        })
 
-    def ajustar_modelo_final(self, log=False, extendido=False):
-        """
-        Ajusta el modelo final con las variables seleccionadas y guarda el modelo.
-        """
-        if not self.variables_seleccionadas:
-            raise ValueError("No hay variables seleccionadas. Ejecutar primero 'stepwise()'.")
+        coef_df.loc[len(coef_df)] = ['Ordenada', self.modelo.intercept_]
 
-        y = np.log10(self.y) if log else self.y
-        X = self.X_extendido if extendido else self.X
+        return coef_df
 
-        modelo = LinearRegression()
-        modelo.fit(X[self.variables_seleccionadas], y)
+    def graficar(self):
+        if self.modelo is None:
+            raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
+        
+        y_real = self.y_real
+        y_pred = self.y_est
 
-        self.modelo_final = modelo  # Guarda el modelo
-        coeficientes = pd.Series(modelo.coef_, index=self.variables_seleccionadas)
-        intercepto = modelo.intercept_
-
-        print("\nModelo final ajustado:")
-        print("Coeficientes:")
-        print(coeficientes.to_string())
-        print(f"Intercepto: {intercepto:.4f}")
-
-    def graficar(self, log=False, extendido=False):
-        if self.modelo_final is None:
-            raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()' y 'ajustar_modelo_final()'.")
-
-        # Obtener X e y según flags
-        X = self.X_extendido if extendido else self.X
-        y_real = np.log10(self.y) if log else self.y
-
-        # Predecir
-        y_pred = self.modelo_final.predict(X[self.variables_seleccionadas])
-
-        # Calcular R²
-        r2 = r2_score(y_real, y_pred)
-
-        # Gráfico
-        plt.figure(figsize=(8, 6))
+        r2 = r2_score(self.y_real, self.y_est)
+        plt.figure(figsize=(6, 6))
         plt.scatter(x=y_real, y=y_pred, color = "#17A77E")
-        plt.plot([y_real.min(), y_real.max()], [y_real.min(), y_real.max()], color='gray', linestyle='--', label='Ideal (y = ŷ)')
+        plt.plot([y_real.min(), y_real.max()], [y_real.min(), y_real.max()], color='gray', linestyle='--')
         plt.xlabel('Valor real')
-        plt.ylabel('Predicción')
-        plt.title(f'Predicción vs Valor real — R² = {r2:.4f}')
-        plt.legend()
+        plt.ylabel('Valor estimado')
+        plt.title(f'R² = {r2:.4f}')
         plt.grid(True)
-        plt.tight_layout()
         plt.show()
-
-

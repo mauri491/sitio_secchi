@@ -266,52 +266,97 @@ y = df['valor']
 
 Para el desarrollo del modelo se implementó la clase ```RegresionLineal```, que contiene el código necesario para la construcción y selección de variables así como para la validación cruzada del modelo. La misma requiere unicamente de los arrays correspondientes a la variable objetivo y a las características con las que estimarla. El script se encuentra disponible [acá](https://github.com/mauri491/sitio_secchi/blob/main/scripts/regresion.py).
 
-Generar un modelo incial sin la construcción de variables adicionales y sin alterar la variable objetivo resulta sencillo:
+La implementación del método sepwise forward selection permite evaluar la adición de variables al modelo predictivo en una instancia inicial donde no se general características adicionales. Los resultados de cada paso se encuentran resumidos en la siguiente tabla:
 ```{python}
+#| echo: false
 Modelo = RegresionLineal(X,y)
 Modelo.stepwise()
 ```
 
-Los coeficientes resultan:
+La banda B05 es la banda que por si sola resulta en la mayor mejoría para el valor de $R^2$, seguida por B02 y B08, a partir de la cual el valor de $R^2-ajustado$ comienza a disminuir, indicando una posible situación de sobreajuste. De este modo, el mejor modelo que puede obtenerse sin generar características adicionales consta de tres variables.
+
+Haciendo uso de la relación logaritmica entre la profundidad de disco y la penetración de la luz descrita y probada previamento se obtiene un modelo con una notable mejoría:
 
 ```{python}
-Modelo.ajustar_modelo_final()
+#| echo: false
+Modelo.stepwise(log_y = True)
 ```
 
-Mientras que la correlación se visualiza de la siguiente manera:
+La mejoría se extiende hasta la adición de la variable B8A, después de la cual hay una ligera disminución de $R^2-ajustado$, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
+
+La aplicación del logaritmo puede extenderse a las variables mismas, resultando en un modelo predictivo mucho más certero con una menor cantidad de variables:
 
 ```{python}
+#| echo: false
+Modelo.stepwise(log_y = True, log_X = True)
+```
+
+La combinación de log(B05) y B02 resulta prometedora. La adición de más variables parecería tender a explicar ruido. Los coeficientes y ordenada de la ecuación resultante son:
+
+```{python}
+#| echo: false
+#| output: false
+Modelo.stepwise(max_vars = 2, log_y = True, log_X = True)
+```
+
+```{python}
+#| echo: false
+Modelo.coeficientes()
+```
+
+El uso de cocientes entre las variables otorga una cantidad mucho más extensiva de predictores, observamos que de considerar a estos junto con las variables linealizadas, estos predominan como mejores contribuyentes a la mejora de la predicción:
+
+```{python}
+#| echo: false
+Modelo.stepwise(log_y = True, log_X = True, cocientes = True)
+```
+
+Los coeficientes y ordenada resultantes de considerar a las primeras dos variables son:
+
+```{python}
+#| echo: false
+#| output: false
+Modelo.stepwise(max_vars = 3, log_y = True, log_X = True, cocientes = True)
+```
+
+```{python}
+#| echo: false
+Modelo.coeficientes()
+```
+
+## Ecuaciones halladas
+
+La primera expresión hallada es de tipo logarítmica:
+
+$$ log(SDD) = -12.80 \cdot log(B05) + 29.14 \cdot B02 - 10.09 $$
+
+```{python}
+#| echo: false
+#| output: false
+Modelo.stepwise(max_vars = 2, log_y = True, log_X = True)
+```
+
+Su ajuste puede visualizarse de la siguiente manera:
+
+```{python}
+#| echo: false
+#| classes: styled-output
 Modelo.graficar()
 ```
+La segunda ecuación hallada es:
 
-Esta correlación no es necesariamente mala, pero puede mejorarse mediante la implementación de las propuestas ya estudiadas como lo son la generación de cocientes entre características y la linealización de la variable objetivo:
-
-```{python}
-Modelo.stepwise(log = True, extendido = True)
-```
+$$ log(SDD) = -3.91\frac{B05}{B02} + 1.63\frac{B11}{B01}+ 7.17  $$
 
 ```{python}
 #| echo: false
 #| output: false
-Modelo.ajustar_modelo_final(log = True, extendido = True)
+Modelo.stepwise(max_vars = 2, log_y = True, cocientes = True)
 ```
 
-```{python}
-Modelo.graficar(log = True, extendido = True)
-```
-
-Observamos que el modelo obtiene una notable mejoría con el uso de sólo cocientes como variables predictivas. Resta entonces, probar utilizar una cantidad mayor o menor de variables y analizar cómo esto afecta a la predicción.
-
-```{python}
-Modelo.stepwise(log = True, extendido = True, max_vars = 3)
-```
-```{python}
-#| echo: false
-#| output: false
-Modelo.ajustar_modelo_final(log = True, extendido = True)
-```
+Su ajuste puede visualizarse de la siguiente manera
 
 ```{python}
 #| echo: false
-Modelo.graficar(log = True, extendido = True)
+#| classes: styled-output
+Modelo.graficar()
 ```
