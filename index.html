@@ -3595,7 +3595,7 @@ window.Quarto = {
 <section id="lectura-de-datos" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="lectura-de-datos"><span class="header-section-number">2.2</span> Lectura de datos</h2>
 <p>Para la carga, lectura y manipulación de la información la librería <em>Pandas</em> permite convertir un archivo .csv en un <em>DataFrame</em>, estructura de datos que facilita la manipulación de estos. El fragmento de código siguiente agrupa los valores de <span class="math inline">\(SDD\)</span> con los valores de reflectancia a diferentes longitudes de onda para los cuales coinciden fecha, latitud y longitud y crea un nuevo <em>DataFrame</em>.</p>
-<div id="1bf0821a" class="cell" data-execution_count="1">
+<div id="549f6b53" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Rutas a los archivos CSV</span></span>
@@ -3701,7 +3701,7 @@ window.Quarto = {
 <section id="análisis-de-los-datos" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="análisis-de-los-datos"><span class="header-section-number">2.3</span> Análisis de los datos</h2>
 <p>La relación no lineal entre la penetración de la luz y la profundidad de disco de Secchi fue ya descrita por diversos autores que hallan una mejor descripción de esta como una de tipo logaritmica <span class="citation" data-cites="modisComparison"><a href="#ref-modisComparison" role="doc-biblioref">[5]</a></span>. Se verifica este comportamiento con las bandas B04, B05 y B06:</p>
-<div id="be5b028c" class="cell" data-execution_count="2">
+<div id="e8f7fb70" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -3715,7 +3715,7 @@ window.Quarto = {
 <h2 data-number="2.4" class="anchored" data-anchor-id="desarrollo-del-modelo"><span class="header-section-number">2.4</span> Desarrollo del modelo</h2>
 <p>Para el desarrollo del modelo se implementó la clase <code>RegresionLineal</code>, que contiene el código necesario para la construcción y selección de variables así como para la validación cruzada del modelo. La misma requiere unicamente de los arrays correspondientes a la variable objetivo y a las características con las que estimarla. El script se encuentra disponible <a href="https://github.com/mauri491/sitio_secchi/blob/main/scripts/regresion.py">acá</a>.</p>
 <p>La implementación del método sepwise forward selection permite evaluar la adición de variables al modelo predictivo en una instancia inicial donde no se general características adicionales. Los resultados de cada paso se encuentran resumidos en la siguiente tabla:</p>
-<div id="7eee7a7f" class="cell" data-execution_count="4">
+<div id="963c776b" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -3776,7 +3776,7 @@ window.Quarto = {
 </div>
 <p>La banda B05 es la banda que por si sola resulta en la mayor mejoría para el valor de <span class="math inline">\(R^2\)</span>, seguida por B02 y B08, a partir de la cual el valor de <span class="math inline">\(R^2-ajustado\)</span> comienza a disminuir, indicando una posible situación de sobreajuste. De este modo, el mejor modelo que puede obtenerse sin generar características adicionales consta de tres variables.</p>
 <p>Haciendo uso de la relación logaritmica entre la profundidad de disco y la penetración de la luz descrita y probada previamento se obtiene un modelo con una notable mejoría:</p>
-<div id="a620d06a" class="cell" data-execution_count="5">
+<div id="b86e30d8" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -3837,7 +3837,7 @@ window.Quarto = {
 </div>
 <p>La mejoría se extiende hasta la adición de la variable B8A, después de la cual hay una ligera disminución de <span class="math inline">\(R^2-ajustado\)</span>, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.</p>
 <p>La aplicación del logaritmo puede extenderse a las variables mismas, resultando en un modelo predictivo mucho más certero con una menor cantidad de variables:</p>
-<div id="b373de4b" class="cell" data-execution_count="6">
+<div id="527c696f" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -3897,7 +3897,7 @@ window.Quarto = {
 </div>
 </div>
 <p>La combinación de log(B05) y B02 resulta prometedora. La adición de más variables parecería tender a explicar ruido. Los coeficientes y ordenada de la ecuación resultante son:</p>
-<div id="6db9bb68" class="cell" data-execution_count="8">
+<div id="8b8dad5a" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -3935,8 +3935,35 @@ window.Quarto = {
 </table>
 </div>
 </div>
+<p>Los coeficientes y ordenada resultantes de considerar a las primeras dos variables son:</p>
+<div id="bfbde21a" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Variable</th>
+<th data-quarto-table-cell-role="th">Coeficiente</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>log(B05)</td>
+<td>-12.806297</td>
+</tr>
+<tr class="even">
+<td>B02</td>
+<td>29.146208</td>
+</tr>
+<tr class="odd">
+<td>Ordenada</td>
+<td>-10.086392</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>El uso de cocientes entre las variables otorga una cantidad mucho más extensiva de predictores, observamos que de considerar a estos junto con las variables linealizadas, estos predominan como mejores contribuyentes a la mejora de la predicción:</p>
-<div id="d4beebe2" class="cell" data-execution_count="9">
+<div id="75248196" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -3996,7 +4023,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Los coeficientes y ordenada resultantes de considerar a las primeras dos variables son:</p>
-<div id="09aa286a" class="cell" data-execution_count="11">
+<div id="b1e8e8b9" class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display">
 <table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -4028,7 +4055,7 @@ window.Quarto = {
 <p>La primera expresión hallada es de tipo logarítmica:</p>
 <p><span class="math display">\[ log(SDD) = -12.80 \cdot log(B05) + 29.14 \cdot B02 - 10.09 \]</span></p>
 <p>Su ajuste puede visualizarse de la siguiente manera:</p>
-<div id="19a9b725" class="cell styled-output" data-execution_count="13">
+<div id="e6a4d3e3" class="cell styled-output" data-execution_count="14">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -4040,7 +4067,7 @@ window.Quarto = {
 <p>La segunda ecuación hallada es:</p>
 <p><span class="math display">\[ log(SDD) = -3.91\frac{B05}{B02} + 1.63\frac{B11}{B01}+ 7.17  \]</span></p>
 <p>Su ajuste puede visualizarse de la siguiente manera:</p>
-<div id="83384bfc" class="cell styled-output" data-execution_count="15">
+<div id="ce0513a8" class="cell styled-output" data-execution_count="16">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

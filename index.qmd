@@ -308,6 +308,13 @@ Modelo.stepwise(max_vars = 2, log_y = True, log_X = True)
 toHTML(Modelo.stepwise(max_vars = 2, log_y = True, log_X = True))
 ```
 
+Los coeficientes y ordenada resultantes de considerar a las primeras dos variables son:
+
+```{python}
+#| echo: false
+toHTML(Modelo.coeficientes())
+```
+
 El uso de cocientes entre las variables otorga una cantidad mucho más extensiva de predictores, observamos que de considerar a estos junto con las variables linealizadas, estos predominan como mejores contribuyentes a la mejora de la predicción:
 
 ```{python}
@@ -332,7 +339,7 @@ toHTML(Modelo.coeficientes())
 
 La primera expresión hallada es de tipo logarítmica:
 
-$$ log(SDD) = -12.80 \cdot log(B05) + 29.14 \cdot B02 - 10.09 $$
+$$ log(SDD) = -12.81 \cdot log(B05) + 29.14 \cdot B02 - 10.09 $$
 
 ```{python}
 #| echo: false
