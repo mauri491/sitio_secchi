@@ -259,6 +259,10 @@ plt.show()
 import sys
 sys.path.append("scripts")  # only if your .py is not in the same folder
 from regresion import *
+from IPython.display import display, HTML
+
+def toHTML(df):
+  display(HTML(df.to_html(index=False)))
 
 X = df.drop(columns='valor')
 y = df['valor']
@@ -270,7 +274,7 @@ La implementación del método sepwise forward selection permite evaluar la adic
 ```{python}
 #| echo: false
 Modelo = RegresionLineal(X,y)
-Modelo.stepwise()
+display(HTML(Modelo.stepwise().to_html(index=False)))
 ```
 
 La banda B05 es la banda que por si sola resulta en la mayor mejoría para el valor de $R^2$, seguida por B02 y B08, a partir de la cual el valor de $R^2-ajustado$ comienza a disminuir, indicando una posible situación de sobreajuste. De este modo, el mejor modelo que puede obtenerse sin generar características adicionales consta de tres variables.
@@ -279,7 +283,7 @@ Haciendo uso de la relación logaritmica entre la profundidad de disco y la pene
 
 ```{python}
 #| echo: false
-Modelo.stepwise(log_y = True)
+toHTML(Modelo.stepwise())
 ```
 
 La mejoría se extiende hasta la adición de la variable B8A, después de la cual hay una ligera disminución de $R^2-ajustado$, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
@@ -288,7 +292,7 @@ La aplicación del logaritmo puede extenderse a las variables mismas, resultando
 
 ```{python}
 #| echo: false
-Modelo.stepwise(log_y = True, log_X = True)
+toHTML(Modelo.stepwise(log_y = True, log_X = True))
 ```
 
 La combinación de log(B05) y B02 resulta prometedora. La adición de más variables parecería tender a explicar ruido. Los coeficientes y ordenada de la ecuación resultante son:
@@ -301,14 +305,14 @@ Modelo.stepwise(max_vars = 2, log_y = True, log_X = True)
 
 ```{python}
 #| echo: false
-Modelo.coeficientes()
+toHTML(Modelo.stepwise(max_vars = 2, log_y = True, log_X = True))
 ```
 
 El uso de cocientes entre las variables otorga una cantidad mucho más extensiva de predictores, observamos que de considerar a estos junto con las variables linealizadas, estos predominan como mejores contribuyentes a la mejora de la predicción:
 
 ```{python}
 #| echo: false
-Modelo.stepwise(log_y = True, log_X = True, cocientes = True)
+toHTML(Modelo.stepwise(log_y = True, log_X = True, cocientes = True))
 ```
 
 Los coeficientes y ordenada resultantes de considerar a las primeras dos variables son:
@@ -316,12 +320,12 @@ Los coeficientes y ordenada resultantes de considerar a las primeras dos variabl
 ```{python}
 #| echo: false
 #| output: false
-Modelo.stepwise(max_vars = 2, log_y = True, log_X = True, cocientes = True)
+toHTML(Modelo.stepwise(max_vars = 2, log_y = True, log_X = True, cocientes = True))
 ```
 
 ```{python}
 #| echo: false
-Modelo.coeficientes()
+toHTML(Modelo.coeficientes())
 ```
 
 ## Ecuaciones halladas
@@ -353,7 +357,7 @@ $$ log(SDD) = -3.91\frac{B05}{B02} + 1.63\frac{B11}{B01}+ 7.17  $$
 Modelo.stepwise(max_vars = 2, log_y = True, cocientes = True)
 ```
 
-Su ajuste puede visualizarse de la siguiente manera
+Su ajuste puede visualizarse de la siguiente manera:
 
 ```{python}
 #| echo: false

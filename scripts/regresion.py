@@ -143,6 +143,9 @@ class RegresionLineal:
         return pd.DataFrame(resultados)
 
     def coeficientes(self):
+        """
+        Devuelve los coeficienes y ordenada al origen del último modelo guardado.
+        """
         if self.modelo is None:
             raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
         
@@ -156,6 +159,9 @@ class RegresionLineal:
         return coef_df
 
     def graficar(self):
+        """
+        Grafica el último modelo guardado.
+        """
         if self.modelo is None:
             raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
         
