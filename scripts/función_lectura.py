@@ -11,6 +11,7 @@ def leer_datos(parámetro, gis, lab): # Parámetro y rutas a los archivos CSV
 
     # Filtrar los parámetros
     df_secchi = df_param[df_param["param"].str.lower() == parámetro]
+    df_secchi = df_secchi[(df_secchi["pixel"] == "3x3")]
 
     # Merge por fecha y coordenadas
     merged = pd.merge(

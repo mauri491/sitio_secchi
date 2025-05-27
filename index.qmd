@@ -153,6 +153,7 @@ df_param = pd.read_csv(archivo_parametros)
 
 # Filtrar los parámetros "secchi"
 df_secchi = df_param[df_param["param"].str.lower() == "secchi"]
+df_reflect = df_reflect[(df_reflect["pixel"] == "3x3")]
 
 # Merge por fecha y coordenadas
 merged = pd.merge(
@@ -283,10 +284,10 @@ Haciendo uso de la relación logaritmica entre la profundidad de disco y la pene
 
 ```{python}
 #| echo: false
-toHTML(Modelo.stepwise())
+toHTML(Modelo.stepwise(log_y = True))
 ```
 
-La mejoría se extiende hasta la adición de la variable B8A, después de la cual hay una ligera disminución de $R^2-ajustado$, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
+La mejoría se extiende hasta la adición de la variable B02, después de la cual hay una ligera disminución de $R^2-ajustado$, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
 
 La aplicación del logaritmo puede extenderse a las variables mismas, resultando en un modelo predictivo mucho más certero con una menor cantidad de variables:
 
@@ -339,7 +340,7 @@ toHTML(Modelo.coeficientes())
 
 La primera expresión hallada es de tipo logarítmica:
 
-$$ log(SDD) = -12.81 \cdot log(B05) + 29.14 \cdot B02 - 10.09 $$
+$$ log(SDD) = -12.89 \cdot log(B05) + 29.11 \cdot B02 - 10.14 $$
 
 ```{python}
 #| echo: false
@@ -356,7 +357,7 @@ Modelo.graficar()
 ```
 La segunda ecuación hallada es:
 
-$$ log(SDD) = -3.91\frac{B05}{B02} + 1.63\frac{B11}{B01}+ 7.17  $$
+$$ log(SDD) = -3.97\frac{B05}{B02} + 1.43\frac{B11}{B01}+ 7.41  $$
 
 ```{python}
 #| echo: false

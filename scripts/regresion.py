@@ -42,7 +42,7 @@ class RegresionLineal:
         Evalúa un modelo de regresión usando validación cruzada.
         """
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-        puntaje_r2, puntaje_rmse, puntaje_r2_adj = [], [], []
+        puntaje_r2, puntaje_rmse, puntaje_r2_adj, puntaje_aic = [], [], [], []
         modelo = None
         
         for train_idx, test_idx in kf.split(X):
@@ -53,11 +53,14 @@ class RegresionLineal:
                 modelo = LinearRegression()
                 modelo.fit(X_train[variables], y_train)
                 y_pred = modelo.predict(X_test[variables])
+                k = len(variables)
             else:
                 y_pred = np.full_like(y_test, y_train.mean(), dtype=float) # Si todavía no se agregaron variables, devolver la media como predicción
-        
+                k = 1
+
             # Cálculo de R² y RMSE
             r2 = r2_score(y_test, y_pred)
+            mse = mean_squared_error(y_test, y_pred)
             rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
             # Cálculo de R² ajustado
@@ -68,15 +71,23 @@ class RegresionLineal:
             else:
                 r2_ajustado = np.nan
 
+            # Calculo el AIC
+            if mse > 0:
+                aic = n_fold * np.log(mse) + 2*k
+            else: 
+                aic = np.nan
+
             # Añado los valores a las listas
             puntaje_r2.append(r2)
             puntaje_rmse.append(rmse)
             puntaje_r2_adj.append(r2_ajustado)
+            puntaje_aic.append(aic)
 
         return {
             'r2': np.mean(puntaje_r2),
             'rmse': np.mean(puntaje_rmse),
-            'r2_adj': np.mean(puntaje_r2_adj)
+            'r2_adj': np.mean(puntaje_r2_adj),
+            'aic': np.mean(puntaje_aic)
         }
 
     def stepwise(self, max_vars=5, n_splits=5, random_state=42, log_y = False, log_X = False, cocientes = False):
@@ -106,7 +117,8 @@ class RegresionLineal:
         'Variable': 'Ninguna',
         'R²': round(metricas_base['r2'], 4),
         'ADJ-R²': round(metricas_base['r2_adj'], 4),
-        'RMSE': round(metricas_base['rmse'], 4)
+        'RMSE': round(metricas_base['rmse'], 4),
+        'AIC': round(metricas_base['aic'], 2)
     })
 
         # Paso X: agregar una variable
@@ -132,7 +144,8 @@ class RegresionLineal:
             'Variable': mejor_variable,
             'R²': round(mejores_metricas['r2'], 4),
             'ADJ-R²': round(mejores_metricas['r2_adj'], 4),
-            'RMSE': round(mejores_metricas['rmse'], 4)
+            'RMSE': round(mejores_metricas['rmse'], 4),
+            'AIC': round(mejores_metricas['aic'], 2)
         })
    
         self.variables = variables_seleccionadas # Esto lo guardo para después armar la tabla de coeficientes
