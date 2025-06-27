@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_squared_error
@@ -147,6 +148,10 @@ class RegresionLineal:
             'RMSE': round(mejores_metricas['rmse'], 4),
             'AIC': round(mejores_metricas['aic'], 2)
         })
+            # Guardo los resultados para poner en las gráficas
+            self.r2 = round(mejores_metricas['r2'], 4)
+            self.r2_adj = round(mejores_metricas['r2_adj'], 4)
+            self.rmse = round(mejores_metricas['rmse'], 4)
    
         self.variables = variables_seleccionadas # Esto lo guardo para después armar la tabla de coeficientes
         self.modelo = LinearRegression() # Guardo el modelo final
@@ -171,22 +176,38 @@ class RegresionLineal:
 
         return coef_df
 
-    def graficar(self):
+    def graficar(self, ax = None, title = ''):
         """
-        Grafica el último modelo guardado.
+        Grafica valor real vs. estimado con línea de tendencia.
         """
         if self.modelo is None:
             raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
-        
+
         y_real = self.y_real
         y_pred = self.y_est
+        # r2 = r2_score(y_real, y_pred)
 
-        r2 = r2_score(self.y_real, self.y_est)
-        plt.figure(figsize=(6, 6))
-        plt.scatter(x=y_real, y=y_pred, color = "#17A77E")
-        plt.plot([y_real.min(), y_real.max()], [y_real.min(), y_real.max()], color='gray', linestyle='--')
-        plt.xlabel('Valor real')
-        plt.ylabel('Valor estimado')
-        plt.title(f'R² = {r2:.4f}')
-        plt.grid(True)
-        plt.show()
+        m, b = np.polyfit(y_real, y_pred, 1)
+        y_tendencia = m * y_real + b
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(5, 5))
+            show = True
+        else:
+            fig = ax.figure
+            show = False
+
+        ax.scatter(y_real, y_pred, color="#17A77E", label="Predicciones")
+        ax.plot(y_real, y_tendencia, color="#117766", label="Línea de tendencia")
+        ax.plot([y_real.min(), y_real.max()], [y_real.min(), y_real.max()], linestyle='--', color='gray', label="Ideal")
+        ax.set_xlabel('Valor real')
+        ax.set_ylabel('Valor estimado')
+        ax.text(0.6,0.05,f'R²: {self.r2}\nR²-ADJ: {self.r2_adj} \nRMSE: {self.rmse}', transform=ax.transAxes,bbox=dict(boxstyle="round, pad=0.5", facecolor="white", edgecolor="gray", alpha=0.6))
+        ax.legend()
+        ax.set_title(title)
+        ax.axis("equal")
+        ax.set_xticks([2.0,2.5,3.0,3.5,4.0,4.5,5.0])
+        ax.grid(True)
+        
+        if show:
+            plt.show()
