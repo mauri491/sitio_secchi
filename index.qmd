@@ -343,7 +343,7 @@ toHTML(Modelo.coeficientes())
 
 ### Corrección por ACOLITE
 
-Se repite el proceso que con los datos corregidos por el algoritmo SEN2COR. Se menciona que en la lectura y tratamiento de datos **se descartaron los puntos para los cuales los valores de reflectancia eran negativos** luego de la corrección.
+Se repite el proceso que con los datos corregidos por el algoritmo SEN2COR. Se menciona que en la lectura y tratamiento de datos se descartaron los puntos para los cuales los valores de reflectancia eran negativos luego de la corrección.
 
 ```{python}
 #| echo: false
@@ -479,4 +479,4 @@ Modelo.graficar(ax = axs[0], title = 'SEN2COR')
 Modelo_ACOLITE.graficar(ax = axs[1], title = 'ACOLITE')
 ```
 
-Observamos que la utilización del algoritmo de ACOLITE para la correcció  atmosférica ocasiona una desmejora en la estimación.
+Observamos que la utilización del algoritmo de ACOLITE para la corrección atmosférica ocasiona una desmejora en la estimación.

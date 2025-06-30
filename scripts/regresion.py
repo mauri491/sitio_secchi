@@ -38,7 +38,7 @@ class RegresionLineal:
 
         return pd.DataFrame(logaritmos), pd.DataFrame(cocientes)
 
-    def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42):
+    def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42, log_y = False):
         """
         Evalúa un modelo de regresión usando validación cruzada.
         """
@@ -62,6 +62,10 @@ class RegresionLineal:
             # Cálculo de R² y RMSE
             r2 = r2_score(y_test, y_pred)
             mse = mean_squared_error(y_test, y_pred)
+            if log_y:
+                y_test = np.exp(y_test)
+                y_pred = np.exp(y_pred)
+
             rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
             # Cálculo de R² ajustado
@@ -112,7 +116,7 @@ class RegresionLineal:
         resultados = []
 
         # Paso 0: predicción con la media
-        metricas_base = self.evaluar_modelo(X, y, [], n_splits, random_state)
+        metricas_base = self.evaluar_modelo(X, y, [], n_splits, random_state , log_y = log_y)
         resultados.append({
         'Paso': 0,
         'Variable': 'Ninguna',
@@ -130,7 +134,7 @@ class RegresionLineal:
 
             for var in variables_restantes:
                 candidatos = variables_seleccionadas + [var]
-                metricas = self.evaluar_modelo(X, y, candidatos, n_splits, random_state)
+                metricas = self.evaluar_modelo(X, y, candidatos, n_splits, random_state,  log_y = log_y)
 
                 if metricas['r2'] > mejor_r2:
                     mejor_r2 = metricas['r2']
@@ -183,8 +187,8 @@ class RegresionLineal:
         if self.modelo is None:
             raise ValueError("No se ajustó un modelo. Ejecutar primero 'stepwise()'.")
 
-        y_real = self.y_real
-        y_pred = self.y_est
+        y_real = np.exp(self.y_real)
+        y_pred = np.exp(self.y_est)
         # r2 = r2_score(y_real, y_pred)
 
         m, b = np.polyfit(y_real, y_pred, 1)
@@ -197,16 +201,15 @@ class RegresionLineal:
             fig = ax.figure
             show = False
 
-        ax.scatter(y_real, y_pred, color="#17A77E", label="Predicciones")
+        ax.scatter(y_real, y_pred, color="#17A77E", alpha = 0.3, label="Predicciones")
         ax.plot(y_real, y_tendencia, color="#117766", label="Línea de tendencia")
         ax.plot([y_real.min(), y_real.max()], [y_real.min(), y_real.max()], linestyle='--', color='gray', label="Ideal")
-        ax.set_xlabel('Valor real')
-        ax.set_ylabel('Valor estimado')
-        ax.text(0.6,0.05,f'R²: {self.r2}\nR²-ADJ: {self.r2_adj} \nRMSE: {self.rmse}', transform=ax.transAxes,bbox=dict(boxstyle="round, pad=0.5", facecolor="white", edgecolor="gray", alpha=0.6))
+        ax.set_xlabel('SDD real (cm)')
+        ax.set_ylabel('SDD estimada (cm)')
+        ax.text(0.5,0.05,f'R²: {self.r2}\nR²-ADJ: {self.r2_adj} \nRMSE: {self.rmse} (cm)', transform=ax.transAxes,bbox=dict(boxstyle="round, pad=0.5", facecolor="white", edgecolor="gray", alpha=0.6))
         ax.legend()
         ax.set_title(title)
         ax.axis("equal")
-        ax.set_xticks([2.0,2.5,3.0,3.5,4.0,4.5,5.0])
         ax.grid(True)
         
         if show:
