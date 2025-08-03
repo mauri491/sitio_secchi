@@ -1,11 +1,13 @@
+# Para la regresión
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_squared_error
+
+# Para la generación de mapas
+import rasterio as rs
 
 class RegresionLineal:
     def __init__(self, X, y):

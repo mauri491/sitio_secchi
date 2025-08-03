@@ -480,3 +480,46 @@ Modelo_ACOLITE.graficar(ax = axs[1], title = 'ACOLITE')
 ```
 
 Observamos que la utilización del algoritmo de ACOLITE para la corrección atmosférica ocasiona una desmejora en la estimación.
+
+## Mapas de la estimación
+
+El mapa generado corresponde a la última fecha disponible.
+```{python}
+#| echo: false
+#| classes: styled-output
+import warnings
+warnings.filterwarnings("ignore")
+
+with rs.open(".\\recorte_acolite\\2025-06-09.tif") as raster:
+            bandas = {
+                'B01': raster.read(1),
+                'B02': raster.read(2),
+                'B03': raster.read(3),
+                'B04': raster.read(4),
+                'B05': raster.read(5),
+                'B06': raster.read(6),
+                'B07': raster.read(7),
+                'B08': raster.read(8),
+                'B8A': raster.read(9),
+                'B11': raster.read(10),
+                'B12': raster.read(11)
+            }
+
+# NDWI para filtrar agua
+B03 = bandas['B03']
+B11 = bandas['B11']
+ndwi = (B03 - B11) / (B03 + B11)
+ndwi_mask = ndwi >= 0.6
+
+ec = np.exp(-2.42*(bandas['B05']/bandas['B03']) + 2.09*(bandas['B08']/bandas['B06']) + 4.15)
+turb = np.where(ndwi_mask == 1, ec, np.nan)
+
+# Visualización
+p5, p95 = np.nanpercentile(turb, [5, 95])
+plt.imshow(turb, cmap='rainbow', vmin=p5, vmax=p95)
+plt.colorbar(label="SDD (cm)")
+plt.title(f"Profundidad estimada 09/06/25")
+plt.axis('off')
+plt.tight_layout()
+plt.show()
+```
