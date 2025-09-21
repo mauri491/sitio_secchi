@@ -1,57 +1,75 @@
-import rasterio as rs
+import warnings
 import numpy as np
-import plotly.express as px
+import rasterio as rs
+import matplotlib.pyplot as plt
+from skimage.filters import threshold_otsu
 
-# Leer imagen
-ruta = r"./recorte_acolite/2025-06-09.tif"
-with rs.open(ruta) as raster:
-    B01 = raster.read(1)
-    B02 = raster.read(2)  # azul
-    B03 = raster.read(3)  # verde
-    B04 = raster.read(4)  # rojo
-    B05 = raster.read(5)
-    B06 = raster.read(6)
-    B07 = raster.read(7)
-    B08 = raster.read(8)
-    B11 = raster.read(10)
+warnings.filterwarnings("ignore")
 
-# Calcular NDWI y máscara
-ndwi = (B03 - B11) / (B03 + B11 + 1e-6)
-ndwi_mask = np.where(ndwi >= 0.6, 1, 0)
+def generar_mapa(fecha):
+    fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(12, 5))
+    with rs.open(f".\\recorte_acolite\\{fecha}.tif") as raster:
+        bandas = { 
+            'B01': raster.read(1), 'B02': raster.read(2), 'B03': raster.read(3),
+            'B04': raster.read(4), 'B05': raster.read(5), 'B06': raster.read(6),
+            'B07': raster.read(7), 'B08': raster.read(8), 'B8A': raster.read(9),
+            'B11': raster.read(10), 'B12': raster.read(11)
+        }
+        meta = raster.meta.copy()  
 
-# Calcular SDD estimada
-sdd = np.exp(-2.42 * (B05 / B03) + 2.09 * (B08 / B06) + 4.15)
-mapa_sdd = np.where(ndwi_mask == 1, sdd, np.nan)
+    def stretch(banda):
+        p2, p98 = np.percentile(banda, (2, 98))
+        return np.clip((banda - p2) / (p98 - p2 + 1e-6), 0, 1)
 
-# Calcular percentiles para mejorar contraste visual
-p5, p95 = np.nanpercentile(mapa_sdd, [5, 95])
+    # RGB 
+    rgb = np.stack([stretch(bandas['B04']), stretch(bandas['B03']), stretch(bandas['B02'])], axis=-1)
 
-# Reemplazar NaN por None (plotly los ignora en hover)
-mapa_sdd_clean = np.where(np.isnan(mapa_sdd), None, mapa_sdd)
+    # NDWI 
+    ndwi = (bandas['B03'] - bandas['B11']) / (bandas['B03'] + bandas['B11'])
+    ndwi_vals = ndwi[np.isfinite(ndwi)]
+    otsu_val = threshold_otsu(ndwi_vals)
 
-# Visualizar con Plotly
-fig = px.imshow(
-    mapa_sdd_clean,
-    color_continuous_scale="Rainbow",
-    zmin=p5,
-    zmax=p95,
-    labels={'z': 'Profundidad de disco (cm)'},
-    title="Profundidad estimada - 2025-06-09"
-)
+    if np.abs(otsu_val) > 1:
+        threshold = np.mean(ndwi_vals)
+    else:
+        threshold = otsu_val
 
-# Personalizar etiqueta hover (solo z) con estilo blanco
-fig.update_traces(
-    hovertemplate="<b>%{z:.2f} cm</b><extra></extra>",
-    hoverlabel=dict(bgcolor="white", font_size=13, font_color="black")
-)
+    ndwi_mask = ndwi >= threshold
 
-# Ocultar ejes
-fig.update_xaxes(visible=False)
-fig.update_yaxes(visible=False)
+    # estimación de turbidez
+    ec = np.exp(-2.42*(bandas['B05']/bandas['B03']) + 2.09*(bandas['B08']/bandas['B06']) + 4.15)
+    turb = np.where(ndwi_mask == 1, ec, np.nan)
+    p5, p95 = np.nanpercentile(turb, [5, 95])
 
-fig.update_layout(
-    coloraxis_colorbar=dict(title="SDD (cm)"),
-    margin=dict(l=10, r=10, t=40, b=10)
-)
+    # actualizar metadatos
+    meta.update({
+        "count": 1,
+        "dtype": "float32",
+        "nodata": np.nan
+    })
 
-fig.show()
+    # guardar raster de turbidez como GeoTIFF
+    output_file = f".//mapas//turb_{fecha}.tif"
+    with rs.open(output_file, "w", **meta) as dst:
+        dst.write(np.clip(turb, p5, p95).astype("float32"), 1)
+
+    # configurar recuadros
+    for ax in axs:
+        ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+
+    axs[0].imshow(rgb)
+    axs[0].set_title('TrueColor')
+
+    axs[1].imshow(ndwi_mask, cmap='gray')
+    axs[1].set_title('NDWI')
+
+    im = axs[2].imshow(turb, cmap='rainbow', vmin=p5, vmax=p95)
+    axs[2].set_title('Estimación')
+
+    # barrita de colores
+    cbar_ax = fig.add_axes([0.92, 0.16, 0.02, 0.68])
+    fig.colorbar(im, cax=cbar_ax, label="SDD (cm)")
+
+    fig.tight_layout(rect=[0, 0, 0.9, 1])
+
+    plt.show()
