@@ -40,51 +40,55 @@ class RegresionLineal:
 
         return pd.DataFrame(logaritmos), pd.DataFrame(cocientes)
 
-    def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42, log_y = False):
+    def evaluar_modelo(self, X, y, variables, n_splits=5, random_state=42, log_y=False):
         """
         Evalúa un modelo de regresión usando validación cruzada.
+        Calcula R², R² ajustado, RMSE y AIC.
         """
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
         puntaje_r2, puntaje_rmse, puntaje_r2_adj, puntaje_aic = [], [], [], []
-        modelo = None
-        
+
         for train_idx, test_idx in kf.split(X):
             X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
             y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
 
+            # modelo de regresión
             if variables:
                 modelo = LinearRegression()
                 modelo.fit(X_train[variables], y_train)
                 y_pred = modelo.predict(X_test[variables])
                 k = len(variables)
             else:
-                y_pred = np.full_like(y_test, y_train.mean(), dtype=float) # Si todavía no se agregaron variables, devolver la media como predicción
+                y_pred = np.full_like(y_test, y_train.mean(), dtype=float)  # predicción inicial
                 k = 1
 
-            # Cálculo de R² y RMSE
-            r2 = r2_score(y_test, y_pred)
-            mse = mean_squared_error(y_test, y_pred)
+            # si el target transformado, destransformo para métricas
             if log_y:
-                y_test = np.exp(y_test)
-                y_pred = np.exp(y_pred)
+                y_test_orig = np.exp(y_test)
+                y_pred_orig = np.exp(y_pred)
+            else:
+                y_test_orig = y_test
+                y_pred_orig = y_pred
 
-            rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+            # cálculo de métricas en la escala original
+            r2 = r2_score(y_test_orig, y_pred_orig)
+            rmse = np.sqrt(mean_squared_error(y_test_orig, y_pred_orig))
 
-            # Cálculo de R² ajustado
-            n_fold = len(y_test) # Número de observaciones
-            p = len(variables) if variables else 0 # Número de variables predictoras
-            if n_fold > p + 1: # Si el número de variables predictoras es igual al número de observaciones, no puede calcularse el R² ajustado
+            # R² ajustado
+            n_fold = len(y_test_orig)
+            p = len(variables) if variables else 0
+            if n_fold > p + 1:
                 r2_ajustado = 1 - (1 - r2) * (n_fold - 1) / (n_fold - p - 1)
             else:
                 r2_ajustado = np.nan
 
-            # Calculo el AIC
+            # AIC
+            mse = mean_squared_error(y_test_orig, y_pred_orig)
             if mse > 0:
-                aic = n_fold * np.log(mse) + 2*k
-            else: 
+                aic = n_fold * np.log(mse) + 2 * k
+            else:
                 aic = np.nan
 
-            # Añado los valores a las listas
             puntaje_r2.append(r2)
             puntaje_rmse.append(rmse)
             puntaje_r2_adj.append(r2_ajustado)
@@ -96,6 +100,7 @@ class RegresionLineal:
             'r2_adj': np.mean(puntaje_r2_adj),
             'aic': np.mean(puntaje_aic)
         }
+
 
     def stepwise(self, max_vars=5, n_splits=5, random_state=42, log_y = False, log_X = False, cocientes = False):
         """

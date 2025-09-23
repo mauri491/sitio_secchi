@@ -128,13 +128,13 @@ Incluir nuevas variables a partir de las originales, como productos, cocientes o
 
 Las métricas de desempeño permiten cuantificar qué tan bien un modelo se ajusta a los datos y predice resultados. Algunas métricas evalúan la calidad del ajuste, otras penalizan la complejidad y algunas miden directamente el error de predicción.
 
-El **Coeficiente de Determinación Ajustado $ADJ-R^2$** es una variante de $R^2$ que corrige la tendencia de este último a aumentar al añadir más variables al modelo, incluso si no aportan mejora real. Mientras que el $R^2$ tradicional mide la proporción de variabilidad de la variable dependiente explicada por el modelo, el $ADJ-R^2$ penaliza la inclusión de predictores irrelevantes, ajustando el valor según el número de observaciones y el número de variables independientes. Esto lo hace más útil para comparar modelos con distinto número de predictores, evitando la falsa impresión de mejora solo por complejidad adicional.
+El **Coeficiente de Determinación Ajustado $R^2-ADJ$** es una variante de R² que corrige la tendencia de este último a aumentar al añadir más variables al modelo, incluso si no aportan mejora real. Mientras que el R² tradicional mide la proporción de variabilidad de la variable dependiente explicada por el modelo, el ADJ-R²penaliza la inclusión de predictores irrelevantes, ajustando el valor según el número de observaciones y el número de variables independientes. Esto lo hace más útil para comparar modelos con distinto número de predictores, evitando la falsa impresión de mejora solo por complejidad adicional.
 
 El **Criterio de Información de Akaike (AIC)** es una métrica utilizada para comparar modelos estadísticos en términos de ajuste y complejidad. Se basa en la teoría de la entropía y busca identificar el modelo que mejor explica los datos con el menor número posible de parámetros. Un valor de AIC más bajo indica un mejor equilibrio entre ajuste y simplicidad. La fórmula general es:
 
 $$AIC = 2k - 2 ln(L)$$
 
-donde $k$ es el número de parámetros estimados en el modelo y $L$ es el valor máximo de la función de verosimilitud. A diferencia del $ADJ-R^2$ el AIC no tiene un valor máximo fijo y es más útil cuando se comparan múltiples modelos candidatos sobre el mismo conjunto de datos.
+donde $k$ es el número de parámetros estimados en el modelo y $L$ es el valor máximo de la función de verosimilitud. A diferencia del ADJ-R² el AIC no tiene un valor máximo fijo y es más útil cuando se comparan múltiples modelos candidatos sobre el mismo conjunto de datos.
 
 El **Error Cuadrático Medio (MSE)** mide el promedio de los cuadrados de las diferencias entre los valores observados y los predichos por el modelo. Es una métrica sensible a errores grandes, ya que los eleva al cuadrado, y por eso penaliza más las predicciones alejadas de la realidad. Su fórmula es:
 
@@ -181,7 +181,6 @@ df_param = pd.read_csv(archivo_parametros)
 
 # Filtrar los parámetros "secchi"
 df_secchi = df_param[df_param["param"].str.lower() == "secchi"]
-df_reflect = df_reflect[(df_reflect["pixel"] == "3x3")]
 
 # Merge por fecha y coordenadas
 merged = pd.merge(
@@ -204,6 +203,10 @@ columnas_finales = ['valor'] + bandas
 
 # Crear Tabla final
 df = tabla_final[columnas_finales]
+
+# Guardar excel para pruebas finales
+salida_excel = ".//datos//tabla_final.xlsx"
+df.to_excel(salida_excel, index=False)
 ```
 
 El *DataFrame* obtenido se asemeja a la siguiente tabla:
@@ -310,7 +313,7 @@ Modelo = RegresionLineal(X,y)
 display(HTML(Modelo.stepwise().to_html(index=False)))
 ```
 
-La banda B05 es la banda que por si sola resulta en la mayor mejoría para el valor de $R^2$, seguida por B02 y B08, a partir de la cual el valor de $ADJ-R^2$ comienza a disminuir, indicando una posible situación de sobreajuste. De este modo, el mejor modelo que puede obtenerse sin generar características adicionales consta de tres variables.
+La combinación de B05, B02 y B08 resulta en el mejor ajuste para valores mínimos de RMSE y AIC.
 
 Haciendo uso de la relación logaritmica entre la profundidad de disco y la penetración de la luz descrita y probada previamente se obtiene un modelo con una notable mejoría:
 
@@ -319,7 +322,7 @@ Haciendo uso de la relación logaritmica entre la profundidad de disco y la pene
 toHTML(Modelo.stepwise(log_y = True))
 ```
 
-La mejoría se extiende hasta la adición de la variable B02, después de la cual hay una ligera disminución de $R^2-ajustado$, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
+La mejoría se extiende hasta la adición de la variable B07, después de la cual hay una ligera disminución de R²-ADJ, pero no lo suficientemente significativa como para tratarse de un caso de sobreajuste considerable.
 
 La aplicación del logaritmo puede extenderse a las variables mismas, resultando en un modelo predictivo mucho más certero con una menor cantidad de variables:
 
@@ -328,7 +331,7 @@ La aplicación del logaritmo puede extenderse a las variables mismas, resultando
 toHTML(Modelo.stepwise(log_y = True, log_X = True))
 ```
 
-La combinación de log(B05) y B02 resulta prometedora. La adición de más variables parecería tender a explicar ruido. Los coeficientes y ordenada de la ecuación resultante son:
+La combinación de log(B05) y B02 resulta prometedora: el valor de AIC es mínimo, el RMSE es bajo, y el R² alto. Los coeficientes y ordenada de la ecuación resultante son:
 
 ```{python}
 #| echo: false
@@ -429,7 +432,7 @@ Partimos de haber hallado que la aplicación del logaritmo a la profundidad de d
 toHTML(Modelo_ACOLITE.stepwise(log_y = True))
 ```
 
-Observamos nuevamente un máximo y un mínimo de $R^2$ y $AIC$ respectivamente. Los valores de $R^2$ y $R^2-ADJ$ aumentaron significativamente respecto a aquellos con la corrección por SEN2COR.
+Observamos que para las mismas combinaciones los valores de R² y R²-ADJ aumentaron significativamente respecto a aquellos con la corrección por SEN2COR.
 
 Para una relación doblemente logarítimica, obtenemos lo siguiente:
 
@@ -441,7 +444,7 @@ toHTML(Modelo_ACOLITE.stepwise(log_y = True, log_X = True))
 ```{python}
 #| echo: false
 #| output: false
-Modelo_ACOLITE.stepwise(max_vars = 2, log_y = True, log_X = True)
+Modelo_ACOLITE.stepwise(max_vars = 3, log_y = True, log_X = True)
 ```
 
 ```{python}
@@ -461,7 +464,7 @@ toHTML(Modelo_ACOLITE.stepwise(log_y = True, log_X = True, cocientes = True))
 ```{python}
 #| echo: false
 #| output: false
-Modelo_ACOLITE.stepwise(max_vars = 2, log_y = True, log_X = True, cocientes = True)
+Modelo_ACOLITE.stepwise(max_vars = 1, log_y = True, log_X = True, cocientes = True)
 ```
 
 ```{python}
@@ -474,16 +477,16 @@ Nuevamente, se ve una desmejora respecto al modelo corregido por SEN2COR. El nú
 ## Ecuaciones halladas
 
 El par de mejores ecuaciones halladas para cada algoritmo de corrección utilizando la transformación logarítmica fueron las siguientes:
-$$ log(SDD)_{SEN2COR} = -12.89 \cdot log(B05) + 29.11 \cdot B02 - 10.14 $$
+$$ log(SDD)_{SEN2COR} = -12.26 \cdot log(B05) + 13.03 \cdot log(B02) + 5.27 $$
 
-$$ log(SDD)_{ACOLITE} = -4.89 \cdot log(B05) + 4.53 \cdot log(B02) + 3.89 $$
+$$ log(SDD)_{ACOLITE} = -5.06 \cdot log(B05) + 6.86 \cdot log(B02) -18.87 \cdot B01 $$
 
 Sus ajustes se visualizan de la siguiente manera:
 ```{python}
 #| echo: false
 #| classes: styled-output
 Modelo.stepwise(max_vars = 2, log_y = True, log_X = True)
-Modelo_ACOLITE.stepwise(max_vars = 2, log_y = True, log_X = True)
+Modelo_ACOLITE.stepwise(max_vars = 3, log_y = True, log_X = True)
 
 fig, axs = plt.subplots(1, 2, figsize=(9, 4))
 Modelo.graficar(ax = axs[0], title = 'SEN2COR')
@@ -491,16 +494,16 @@ Modelo_ACOLITE.graficar(ax = axs[1], title = 'ACOLITE')
 ```
 El par de mejores ecuaciones halladas para cada algoritmo utilizando cocientes entre las variables es:
 
-$$ log(SDD)_{SEN2COR} = -3.97\frac{B05}{B02} + 1.43\frac{B11}{B01}+ 7.41 $$
+$$ log(SDD)_{SEN2COR} = -4.27\frac{B05}{B02} + 0.64\cdot log(B01)+ 9.43 $$
 
-$$ log(SDD)_{ACOLITE} = -2.42\frac{B05}{B03} + 2.09\frac{B08}{B06}+ 4.15 $$
+$$ log(SDD)_{ACOLITE} = -1.58\frac{B04}{B02} + 6.40 $$
 
 Sus ajustes se visualizan de la siguiente manera:
 ```{python}
 #| echo: false
 #| classes: styled-output
-Modelo.stepwise(max_vars = 2, log_y = True, cocientes = True)
-Modelo_ACOLITE.stepwise(max_vars = 2, log_y = True, cocientes = True)
+Modelo.stepwise(max_vars = 2, log_y = True, log_X = True, cocientes = True)
+Modelo_ACOLITE.stepwise(max_vars = 1, log_y = True, cocientes = True)
 
 fig, axs = plt.subplots(1, 2, figsize=(9, 4))
 Modelo.graficar(ax = axs[0], title = 'SEN2COR')
@@ -564,56 +567,4 @@ generar_mapa("2023-05-11")
 ```
 :::
 
-# Random Forest
-```{python}
-#| echo: false
-
-import sys
-sys.path.append("scripts") 
-from machine_learning import *
-
-import pandas as pd
-
-# Rutas a los archivos CSV
-archivo_reflectancias = "datos\\base_de_datos_gis.csv"  # contiene: fecha,punto,pixel,banda,reflect,longitud,latitud
-archivo_parametros = "datos\\base_de_datos_lab.csv"     # contiene: fecha,longitud,latitud,param,valor
-
-# Leer los archivos
-df_reflect = pd.read_csv(archivo_reflectancias)
-df_param = pd.read_csv(archivo_parametros)
-
-# Filtrar los parámetros "secchi"
-df_secchi = df_param[df_param["param"].str.lower() == "secchi"]
-df_reflect = df_reflect[(df_reflect["pixel"] == "3x3")]
-
-# Merge por fecha y coordenadas
-merged = pd.merge(
-    df_secchi,
-    df_reflect,
-    on=["fecha", "latitud", "longitud"],
-    how="inner"
-)
-
-# Pivotear la tabla para poner bandas como columnas
-tabla_final = merged.pivot_table(
-    index=["param", "fecha", "longitud", "latitud", "valor"], 
-    columns="banda",
-    values="reflect"
-).reset_index()
-
-# Reordenar columnas: param | B01 | B02 | ... | B8A
-bandas = ['B01', 'B02', 'B03', 'B04', 'B05', 'B06', 'B07', 'B08', 'B11', 'B12', 'B8A']
-columnas_finales = ['valor'] + bandas
-
-# Crear Tabla final
-df = tabla_final[columnas_finales]
-X = df.drop(columns='valor')
-y = df['valor']
-
-reg = RegresionML(X, y)
-
-# entrenar
-reg.train_xgb()
-reg.graficar(model = 'xgb')
-```
-
+# Métodos de aprendizaje automático

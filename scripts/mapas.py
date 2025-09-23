@@ -37,10 +37,10 @@ def generar_mapa(fecha):
     ndwi_mask = ndwi >= threshold
 
     # estimación de turbidez
-    ec = np.exp(-2.42*(bandas['B05']/bandas['B03']) + 2.09*(bandas['B08']/bandas['B06']) + 4.15)
+    ec = np.exp(-4.27*(bandas['B05']/bandas['B02']) + 0.64*(np.log(bandas['B01'])) + 9.43)
     turb = np.where(ndwi_mask == 1, ec, np.nan)
     p5, p95 = np.nanpercentile(turb, [5, 95])
-
+    
     # actualizar metadatos
     meta.update({
         "count": 1,

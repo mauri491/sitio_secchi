@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -10,30 +11,45 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import joblib
 
 class RegresionML:
-    def __init__(self, X, y):
+    def __init__(self, X, y, ratios = False):
+        
         self.X = X
         self.y = y
-
-        # división de datos
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X,y, test_size = 0.2, random_state = 42)
+        self.ratios = ratios
 
         # espacio para modelos y parámetros
         self.rf_mejor_modelo = None
         self.rf_mejores_parametros = None
         self.xgb_mejor_modelo = None
         self.xgb_mejores_parametros = None
+
+        cocientes = {}
+        columnas = X.columns
+        
+        if ratios == True:
+            for i in range(X.shape[1]):
+                for j in range(X.shape[1]):
+                    if j != i:
+                        col1, col2 = columnas[i], columnas[j]
+                        q = X[col1] / X[col2].replace(0, np.nan)
+                        cocientes[f'{col1}/{col2}'] = q # Genera cocientes
+            
+            self.X = pd.concat([self.X, pd.DataFrame(cocientes)], axis=1)
     
+        # división de datos
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X,self.y, test_size = 0.2, random_state = 42)
+
     def cargar_modelo(self, model = "rf", filename = None):
         if model == "rf":
-            self.rf_mejor_modelo = joblib.load(f".//modelos_ml//{filename}")
+            self.rf_mejor_modelo = joblib.load(f"..//modelos_ml//{filename}")
         elif model == "xgb":
-            self.xgb_mejor_modelo = joblib.load(f".//modelos_ml//{filename}")
+            self.xgb_mejor_modelo = joblib.load(f"..//modelos_ml//{filename}")
         else:
             raise ValueError("Especificar nombre del modelo")
 
     def train_rf(self):
         param_grid = {
-            "n_estimators": [200, 300, 500],
+            "n_estimators": [200, 300, 5,00],
             "max_depth": [None, 10, 20],
             "min_samples_split": [2, 5],
             "min_samples_leaf": [1, 2],
@@ -62,7 +78,7 @@ class RegresionML:
         self.r2_global = round(r2_score(y_pred_global, self.y), 4)
 
 
-        joblib.dump(grid_search.best_estimator_, f".//modelos_ml//rf_{datetime.now().strftime('%y%m%d')}_{self.r2_global}_{self.r2}.pkl") 
+        joblib.dump(grid_search.best_estimator_, f"..//modelos_ml//rf_{datetime.now().strftime('%y%m%d')}_{self.r2_global}_{self.r2}.pkl") 
 
         return {"MAE": self.mae, "RMSE": self.rmse, "R2": self.r2}
 
@@ -101,17 +117,16 @@ class RegresionML:
         self.r2 = round(r2_score(self.y_test, y_pred), 4)
         self.r2_global = round(r2_score(y_pred_global, self.y), 4)
 
-        joblib.dump(grid_search.best_estimator_, f".//modelos_ml//xgb_{datetime.now().strftime('%y%m%d')}_{self.r2_global}_{self.r2}.pkl") 
+        joblib.dump(grid_search.best_estimator_, f"..//modelos_ml//xgb_{datetime.now().strftime('%y%m%d')}_{self.r2_global}_{self.r2}.pkl") 
 
         return {"MAE": self.mae, "RMSE": self.rmse, "R2": self.r2}
     
     def graficar(self, model = "rf"):
+        ratios = self.ratios
         if model == "rf":
             modelo = self.rf_mejor_modelo
-            title = "Random Forest"
         elif model == "xgb":
             modelo = self.xgb_mejor_modelo
-            title = "XGBoost"
         else:
             raise ValueError("Modelo debe ser 'rf' o 'xgb'")
         
@@ -139,11 +154,20 @@ class RegresionML:
         ax.set_ylabel('SDD estimada (cm)')
         ax.text(0.5,0.05,f'R²: {r2_global}\nR²-testeo: {self.r2}\nRMSE: {rmse_global} (cm)\nRMSE-testeo: {self.rmse} (cm)', transform=ax.transAxes, bbox=dict(boxstyle="round, pad=0.5", facecolor="white", edgecolor="gray", alpha=0.6))
         ax.legend()
-        ax.set_title(title)
         ax.axis("equal")
         ax.grid(True)
         if model == "rf":
-            plt.savefig(f".//modelos_ml//rf_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
+            if ratios == True:
+                ax.set_title("Random Forest (Cocientes incorporados)")
+                plt.savefig(f"..//modelos_ml//rf_ratios_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
+            else:
+                ax.set_title("Random Forest")
+                plt.savefig(f"..//modelos_ml//rf_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
         elif model == "xgb":
-            plt.savefig(f".//modelos_ml//xgb_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
+            if ratios == True:
+                ax.set_title("XGBoost (Cocientes incorporados)")
+                plt.savefig(f"..//modelos_ml//xgb_ratios_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
+            else:
+                ax.set_title("XGBoost")
+                plt.savefig(f"..//modelos_ml//xgb_{datetime.now().strftime('%y%m%d')}_{r2_global}_{self.r2}.png", dpi=300, bbox_inches='tight')
 
