@@ -1,5 +1,7 @@
 ---
+pagetitle: "Presentación"
 title: "Estimación de profundidad de disco de Secchi para el desarrollo de un algoritmo mediante técnicas de teledetección satelital"
+toc: false
 format: 
   html:
     css: index_style.css
@@ -7,8 +9,9 @@ format:
 include-before-body: header-logo.html 
 include-in-header:
   - text: |
-      <link rel = "shortcut icon" href = "img/Logo_monitoreo.png" />
+      <link rel = "shortcut icon" href = "img/favicon.png" />
 date: last-modified
+
 language: 
   title-block-author-single: "Autor"
 author:

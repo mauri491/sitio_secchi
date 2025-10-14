@@ -29,3 +29,18 @@ li{
 .quarto-title > h1.title {
     display: none !important;
 }
+
+@media (max-width: 768px) { /* Adjust breakpoint as needed */
+    .navbar-collapse {
+      display: flex !important; /* Force display as flex */
+      visibility: visible !important; /* Ensure visibility */
+      height: auto !important; /* Prevent height collapse */
+    }
+    .navbar-toggler {
+      display: none !important; /* Hide the collapse button if not needed */
+    }
+    /* Add more rules for specific nav items if they are still hiding */
+    .nav-item {
+      display: block !important; /* Or inline-block, depending on desired layout */
+    }
+  }

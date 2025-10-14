@@ -6,7 +6,7 @@ format:
     lang: es
 include-in-header:
   - text: |
-      <link rel = "shortcut icon" href = "img/Logo_monitoreo.png" />
+      <link rel = "shortcut icon" href = "img/favicon.png" />
 
 ---
 

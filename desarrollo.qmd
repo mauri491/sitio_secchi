@@ -1,5 +1,5 @@
 ---
-title: "Desarrollo integral de las ecuaciones y modelos de regresión"
+pagetitle: "Desarrollo"
 format: 
   html:
     number-sections: true
@@ -15,7 +15,7 @@ format:
 
 include-in-header:
   - text: |
-      <link rel = "shortcut icon" href = "img/Logo_monitoreo.png" />
+      <link rel = "shortcut icon" href = "img/favicon.png" />
 ---
 
 # Revisión bibliográfica

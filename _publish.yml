@@ -2,3 +2,9 @@
   quarto-pub:
     - id: 303229bf-aca0-4930-bc06-5055a3940022
       url: https://mauri491.quarto.pub/estimacion-secchi
+- source: project
+  quarto-pub:
+    - id: 1ca614c6-2f63-474d-b8cf-4e7d88fbf9c3
+      url: https://mauri491.quarto.pub/sitio_secchi
+    - id: e081407f-687a-44fd-b314-9eaa305f9e26
+      url: https://mauri491.quarto.pub/estimacion-secchi
