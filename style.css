@@ -18,3 +18,7 @@ li{
     margin-left: auto;
     margin-right: auto;
   }
+
+.quarto-title > h1.title {
+    display: none !important;
+}

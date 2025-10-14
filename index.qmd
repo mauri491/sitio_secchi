@@ -12,8 +12,11 @@ format:
     bibliography: bibliografia/bibliografia.bib
     csl: bibliografia/ieee.csl
     cap-location: bottom
+include-before-body: header-logo.html 
+include-in-header:
+  - text: |
+      <link rel = "shortcut icon" href = "img/Logo_monitoreo.png" />
 date: last-modified
-
 language: 
   title-block-author-single: "Autor"
 
@@ -568,3 +571,80 @@ generar_mapa("2023-05-11")
 :::
 
 # Métodos de aprendizaje automático
+
+En esta sección se emplean modelos de aprendizaje automático con el objetivo de estimar la profundidad del disco de Secchi a partir de variables predictoras derivadas de la reflectancia satelital. Estos modelos permiten identificar relaciones no lineales y aprovechar la información multiespectral de forma más eficiente que los métodos lineales tradicionales. En particular, se evalúan distintos algoritmos y configuraciones de hiperparámetros para optimizar la capacidad de predicción y analizar la contribución relativa de cada variable a la estimación de la transparencia del agua.
+
+## Random Forest
+
+Random Forest es un algoritmo de aprendizaje automático basado en un conjunto de árboles de decisión entrenados con muestras y variables aleatorias. La combinación de múltiples árboles reduce la varianza y mejora la capacidad de generalización del modelo. Es robusto frente al sobreajuste y adecuado para capturar relaciones no lineales entre las variables.
+
+### Hiperparámetros
+
+Los hiperparámetros son valores que se definen antes del entrenamiento de un modelo y controlan cómo aprende. Ajustarlos correctamente permite mejorar el rendimiento y la capacidad de generalización del modelo.
+
+- ```n_estimators``` es el número total de árboles que se crearán en el bosque aleatorio. Cada árbol se entrena con una muestra distinta de los datos (si bootstrap=True) y sus predicciones se promedian. Aumentar este número hace que el modelo sea más estable y consistente, reduciendo la varianza y mejorando la precisión. Sin embargo, también incrementa el tiempo de entrenamiento y el uso de memoria, por lo que hay que buscar un equilibrio.
+
+- ```max_depth``` determina la cantidad máxima de niveles que puede tener cada árbol, es decir, cuántas divisiones sucesivas puede hacer desde la raíz hasta una hoja. Cuanto más profundo sea un árbol, más patrones complejos puede aprender, pero también corre el riesgo de memorizar el ruido de los datos (sobreajuste). Por el contrario, limitar la profundidad hace que los árboles sean más simples y generalicen mejor, aunque podrían no capturar todas las relaciones presentes en los datos.
+
+- ```min_samples_split``` indica el número mínimo de muestras necesarias para dividir un nodo en dos ramas. Este parámetro evita que el árbol realice divisiones basadas en muy pocos datos, que podrían ser poco representativos. Valores pequeños permiten divisiones frecuentes, generando árboles más complejos y propensos al sobreajuste, mientras que valores mayores producen divisiones más conservadoras y árboles más suaves que generalizan mejor.
+
+- ```min_samples_leaf``` establece el mínimo de muestras que debe contener una hoja, es decir, un nodo terminal del árbol. Si se permite una sola muestra por hoja, el árbol puede memorizar los datos y generar predicciones muy específicas pero poco generalizables. Aumentar este valor hace que cada hoja represente un promedio de varias observaciones, produciendo predicciones más estables y menos sensibles al ruido.
+
+- ```max_features``` determina cuántas variables se consideran al buscar la mejor división en cada nodo. Limitar la cantidad de features introduce aleatoriedad en cada árbol, lo que reduce la correlación entre ellos y mejora la generalización del bosque. Por ejemplo, "sqrt" utiliza la raíz cuadrada del total de variables y "log2" utiliza el logaritmo base 2 del total de variables. La diferencia es sutil pero importante: "log2" suele considerar menos variables en cada división, aumentando la diversidad entre árboles, mientras que "sqrt" toma un número ligeramente mayor, equilibrando diversidad y cantidad de información.
+
+- ```bootstrap```
+ indica si cada árbol se entrena con una muestra aleatoria con reemplazo del conjunto total de datos. Si es True, cada árbol ve datos diferentes, lo que genera más diversidad entre árboles y mejora la capacidad de generalización. Si es False, todos los árboles utilizan el mismo conjunto, lo que puede hacerlos más parecidos entre sí y aumentar la posibilidad de sobreajuste. Además, usar bootstrap permite calcular errores de tipo “out-of-bag” para evaluar el modelo sin necesidad de un conjunto de validación separado.
+
+### Resultados
+
+![](modelos_ml\rf_251014_0.9423_0.8823.png)
+
+El modelo Random Forest mostró un buen nivel de ajuste y capacidad predictiva, capturando adecuadamente las relaciones entre variables. Sin embargo, presentó un RMSE más alto en comparación con los modelos lineales, lo que indica mayor dispersión en las predicciones y una menor precisión promedio pese a su buen desempeño general. La importancia de cada variable fue la siguiente:
+
+![](modelos_ml\rf_importancia_251014.png)
+
+Las bandas B04 y B04 predominan en el ranking, esto puede deberse a que las bandas Red y Red Edge (B05–B06-B07) se ubican justo en la transición entre el rojo y el infrarrojo cercano, donde la reflectancia del agua cambia mucho con la concentración de sedimentos. Esto las hace excelentes indicadores de la turbidez y material particulado suspendido.
+
+Con el objetivo de mejorar el desempeño de los modelos, se incorporaron cocientes entre variables como nuevas características predictoras. Estas relaciones permiten resaltar contrastes espectrales y capturar patrones relativos entre bandas, lo que puede aumentar la sensibilidad del modelo frente a variaciones en la transparencia del agua y mejorar la estimación.
+
+![](modelos_ml\rf_ratios_251014_0.9876_0.9295.png)
+
+Al introducir los cocientes entre variables como nuevas características, se observa una mejora notable en el desempeño de los modelos. En particular, el RMSE se redujo hasta menos de la mitad, indicando predicciones más precisas y consistentes
+
+![](modelos_ml\rf_importancia_ratios_251014.png)
+
+## XGBoost
+
+XGBoost (Extreme Gradient Boosting) es un método de boosting que construye árboles de manera secuencial, donde cada uno corrige los errores del anterior. Incorpora técnicas de regularización y optimización que aumentan la precisión y evitan el sobreajuste, ofreciendo un excelente desempeño en tareas de regresión y clasificación.
+
+### Hiperparámetros
+
+Además de los hiperparámetros ```n_estimators``` y ```max_depth``` ya vistos para Random Forest, XGBoost cuenta con los siguientes hiperparámetros:
+
+- ```learning_rate``` controla cuánto contribuye cada árbol nuevo a la predicción total. Valores bajos (por ejemplo, 0.05) hacen que el modelo aprenda más despacio y con mayor precisión, requiriendo más árboles (n_estimators) para converger. Valores altos aceleran el aprendizaje, pero pueden provocar sobreajuste si los árboles son profundos o abundantes.
+
+- ```subsample``` indica la fracción de muestras de entrenamiento que se usan para construir cada árbol. Un valor menor que 1 introduce aleatoriedad, lo que reduce la correlación entre árboles y mejora la generalización, pero demasiado bajo puede hacer que el modelo no aprenda bien. Un valor de 1 significa que todos los datos se usan en cada árbol, maximizando ajuste pero con menor diversidad.
+
+- ```colsample_bytree``` define la fracción de variables (features) consideradas al entrenar cada árbol. Limitar las columnas aumenta la aleatoriedad entre árboles, reduciendo la correlación y el sobreajuste. Por ejemplo, 0.8 significa que cada árbol ve solo el 80% de las variables disponibles.
+
+- ```gamma``` es el mínimo incremento en la función de pérdida requerido para realizar una división adicional en un nodo. Valores mayores hacen que el árbol sea más conservador, evitando divisiones que aporten poca mejora en la predicción, lo que ayuda a reducir sobreajuste.
+
+- ```reg_alpha``` es la penalización de tipo L1 sobre los pesos de los árboles. Ayuda a reducir la complejidad del modelo y puede forzar algunos pesos a cero, promoviendo sparsity y simplificación. Esto es útil si hay muchas variables poco relevantes.
+
+- ```reg_lambda``` es la penalización de tipo L2 sobre los pesos de los árboles. Contrarresta valores extremos y ayuda a estabilizar el modelo, evitando que algunos árboles dominen la predicción y reduciendo el riesgo de sobreajuste.
+
+### Resultados
+
+![](modelos_ml\xgb_251014_0.9761_0.8636.png)
+
+El modelo XGBoost demuestra desde un inicio un poder predictivo mayor al de Random Forest y a su vez una dispersión mucho menor en las predicciones.
+
+![](modelos_ml\xgb_importancia_251014.png)
+
+Nuevamente se repite la predominancia de las bandas B04 y B05 en el ranking.
+
+![](modelos_ml\xgb_ratios_251014_0.9909_0.9487.png)
+
+Se observa que la incorporación de cocientes incrementa considerablemente el poder predictivo, a la vez que el RMSE disminuye a valor comparables con el mejor de los valores lineales previamente obtenidos.
+
+![](modelos_ml\xgb_importancia_ratios_251014.png)
