@@ -19,6 +19,9 @@ li{
     margin-right: auto;
   }
 
-.quarto-title > h1.title {
-    display: none !important;
-}
+.navbar-nav,
+.navbar-nav li {
+      list-style: none !important;
+      margin: 0;
+      padding: 0;
+  }

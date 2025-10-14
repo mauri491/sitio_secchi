@@ -1,0 +1,26 @@
+project:
+  type: website
+
+website:
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Presentación"
+      - href: desarrollo.qmd
+        text: "Desarrollo"
+      - href: estimacion.qmd
+        text: "Estimaciones"
+  search: false
+  
+execute:
+  freeze: true
+
+format:
+  html:
+    theme:
+      - default
+    css: style.css
+    toc: true
+
+
+
